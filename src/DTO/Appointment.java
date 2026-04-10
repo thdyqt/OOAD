@@ -21,6 +21,15 @@ public class Appointment {
     
     public Appointment() {}
     
+    public Appointment(int calendarId, String name, String location, LocalDateTime startTime, LocalDateTime endTime, boolean isGroupMeeting) {
+        this.calendarId = calendarId;
+        this.name = name;
+        this.location = location;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.isGroupMeeting = isGroupMeeting;
+    }
+        
     public Appointment(int appointmentId, int calendarId, String name, String location, LocalDateTime startTime, LocalDateTime endTime, boolean isGroupMeeting) {
         this.appointmentId = appointmentId;
         this.calendarId = calendarId;

@@ -1,11 +1,14 @@
 package VIEW;
 
+import BLL.AppointmentManager;
+import DTO.Appointment;
 import DTO.User;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class AddAppointmentWindow extends JDialog {
@@ -21,6 +24,7 @@ public class AddAppointmentWindow extends JDialog {
     private RoundedButton btnCancel;
 
     private User currentUser;
+    private int currentCalendarId;
     private LocalDate selectedDate;
 
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
@@ -28,10 +32,11 @@ public class AddAppointmentWindow extends JDialog {
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
     private final Color COLOR_BORDER = new Color(210, 215, 220);
 
-    public AddAppointmentWindow(Frame parent, boolean modal, User user, LocalDate date) {
+    public AddAppointmentWindow(Frame parent, boolean modal, User user, LocalDate date, int calendarId) {
         super(parent, modal);
         this.currentUser = user;
         this.selectedDate = date;
+        this.currentCalendarId = calendarId;
 
         setTitle("Thêm Cuộc Hẹn");
         setSize(480, 550);
@@ -184,18 +189,12 @@ public class AddAppointmentWindow extends JDialog {
     private void styleSpinner(JSpinner spinner) {
         spinner.setPreferredSize(new Dimension(75, 28));
         JComponent editor = spinner.getEditor();
-        if (editor instanceof JSpinner.DefaultEditor) {
-            JTextField txt = ((JSpinner.DefaultEditor) editor).getTextField();
+        if (editor instanceof JSpinner.DefaultEditor defaultEditor) {
+            JTextField txt = defaultEditor.getTextField();
             txt.setFont(new Font("Segoe UI", Font.PLAIN, 15));
             txt.setHorizontalAlignment(SwingConstants.CENTER);
             txt.setBorder(BorderFactory.createEmptyBorder());
         }
-    }
-    
-    public int getDuration(int startH, int startM, int endH, int endM) {
-        int startTimeMinutes = startH * 60 + startM;
-        int endTimeMinutes = endH * 60 + endM;
-        return endTimeMinutes - startTimeMinutes;
     }
     
     private void handleSave() {
@@ -207,16 +206,26 @@ public class AddAppointmentWindow extends JDialog {
         int endM = (int) spinEndMinute.getValue();
         boolean isGroup = chkGroup.isSelected();
         
-        if (name.isEmpty() || location.isEmpty()) {
-            JOptionPane.showMessageDialog(rootPane, "Vui lòng nhập đầy đủ thông tin!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            return;
+        LocalDateTime startTime = selectedDate.atTime(startH, startM);
+        LocalDateTime endTime = selectedDate.atTime(endH, endM);
+        
+        DTO.Appointment newAppointment = new DTO.Appointment();
+        newAppointment.setCalendarId(currentCalendarId); 
+        newAppointment.setName(name);
+        newAppointment.setLocation(location);
+        newAppointment.setStartTime(startTime);
+        newAppointment.setEndTime(endTime);
+        newAppointment.setIsGroupMeeting(isGroup);
+
+        String result = AppointmentManager.addAppointment(newAppointment);
+        
+        if (result == "SUCCESS"){
+           ReminderDialog dialog = new ReminderDialog(AddAppointmentWindow.this, true, newAppointment);
+           this.dispose();
         }
-        
-        if (getDuration(startH, startM, endH, endM) < 0) {
-            JOptionPane.showMessageDialog(rootPane, "Thời gian kết thúc phải sau thời gian bắt đầu!", "Lỗi", JOptionPane.WARNING_MESSAGE);
-            return;
+        else{
+            JOptionPane.showMessageDialog(rootPane, result, "Lỗi", JOptionPane.WARNING_MESSAGE); 
         }
-        
-        
+         
     }
 }

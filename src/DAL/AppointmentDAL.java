@@ -14,7 +14,7 @@ import java.util.List;
  * @author Admin
  */
 public class AppointmentDAL {
-    public List<Appointment> getAppointmentsByCalendarId(int calendarId) {
+    public static List<Appointment> getAppointmentsByCalendarId(int calendarId) {
         List<Appointment> list = new ArrayList<>();
         String sql = "SELECT * FROM Appointments WHERE calendar_id = ?";
         
@@ -41,9 +41,8 @@ public class AppointmentDAL {
         return list;
     }
     
-    public boolean insertAppointment(Appointment apt) {
-        String sql = "INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting) \n" +
-"VALUES (?, ?, ?, ?, ?, ?)";
+    public static boolean insertAppointment(Appointment apt) {
+        String sql = "INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting) VALUES (?, ?, ?, ?, ?, ?)";
         
         try (Connection con = DBConnection.getConnection(); 
                 PreparedStatement stmt = con.prepareStatement(sql)){
@@ -61,7 +60,7 @@ public class AppointmentDAL {
         }
     }
     
-    public boolean updateAppointment(Appointment appt) {
+    public static boolean updateAppointment(Appointment appt) {
         String sql = "UPDATE Appointments SET name = ?, location = ?, start_time = ?, end_time = ?, is_group_meeting = ? WHERE appointment_id = ?";
         
         try (Connection conn = DBConnection.getConnection();
@@ -81,7 +80,7 @@ public class AppointmentDAL {
         }
     }
     
-    public boolean deleteAppointment(int appointmentId) {
+    public static boolean deleteAppointment(int appointmentId) {
         String sql = "DELETE FROM Appointments WHERE appointment_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

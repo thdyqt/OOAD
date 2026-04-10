@@ -10,7 +10,8 @@ CREATE TABLE Users (
 
 CREATE TABLE Calendars (
     calendar_id INT AUTO_INCREMENT PRIMARY KEY,
-    owner_id INT UNIQUE NOT NULL, 
+    owner_id INT NOT NULL, 
+    name VARCHAR(100) DEFAULT 'Lịch Mặc Định',
     time_zone VARCHAR(50) DEFAULT 'Asia/Ho_Chi_Minh',
     FOREIGN KEY (owner_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
@@ -44,9 +45,9 @@ CREATE TABLE Meeting_Participants (
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
-INSERT INTO Users (username, email) VALUES 
-('Phan Thanh Duy', '102240130@sv1.dut.udn.vn'),
-('Giang Vien', 'gv@dut.udn.vn');
+INSERT INTO Users (username, email, password) VALUES 
+('Phan Thanh Duy', '102240130@sv1.dut.udn.vn', 123456),
+('Giang Vien', 'gv@dut.udn.vn', 123456);
 
 INSERT INTO Calendars (owner_id) VALUES 
 (1), (2);

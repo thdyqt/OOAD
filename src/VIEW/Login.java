@@ -14,7 +14,6 @@ public class Login extends JFrame {
     private RoundedButton btnLogin;
     private RoundedButton btnGoToRegister;
 
-    // Định nghĩa các màu sắc đồng bộ với hệ thống
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
@@ -24,7 +23,7 @@ public class Login extends JFrame {
 
     public Login() {
         setTitle("Đăng nhập hệ thống Calendar");
-        setSize(450, 350); // Cập nhật lại kích thước cho cân đối
+        setSize(450, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
@@ -35,7 +34,6 @@ public class Login extends JFrame {
     }
 
     private void initComponents() {
-        // --- HEADER ---
         JPanel panelHeader = new JPanel();
         panelHeader.setBackground(COLOR_BG);
         panelHeader.setBorder(new EmptyBorder(30, 0, 10, 0));
@@ -47,7 +45,6 @@ public class Login extends JFrame {
 
         add(panelHeader, BorderLayout.NORTH);
 
-        // --- FORM CENTER ---
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBackground(COLOR_BG);
         panelForm.setBorder(new EmptyBorder(10, 40, 20, 40));
@@ -55,7 +52,6 @@ public class Login extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 0, 10, 15);
 
-        // Email Label & Field
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.3;
         JLabel lblEmail = new JLabel("Email:");
         lblEmail.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -67,7 +63,6 @@ public class Login extends JFrame {
         styleTextField(txtEmail);
         panelForm.add(txtEmail, gbc);
 
-        // Password Label & Field
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.3;
         JLabel lblPassword = new JLabel("Mật khẩu:");
         lblPassword.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -81,7 +76,6 @@ public class Login extends JFrame {
 
         add(panelForm, BorderLayout.CENTER);
 
-        // --- FOOTER BUTTONS ---
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
         panelFooter.setBackground(COLOR_BG);
 
@@ -102,7 +96,6 @@ public class Login extends JFrame {
 
         add(panelFooter, BorderLayout.SOUTH);
 
-        // Events
         btnLogin.addActionListener(e -> handleLogin());
         btnGoToRegister.addActionListener(e -> {
             new Register().setVisible(true);
@@ -131,10 +124,8 @@ public class Login extends JFrame {
         User loggedInUser = userBLL.login(email, password);
 
         if (loggedInUser != null) {
-            JOptionPane.showMessageDialog(this, "Đăng nhập thành công! Xin chào " + loggedInUser.getUsername());
-            // Mở CalendarUI sau khi login thành công (nếu cần thiết tích hợp luôn ở đây)
-            // new CalendarUI(loggedInUser).setVisible(true);
-            // this.dispose();
+           new CalendarUI(loggedInUser).setVisible(true);
+           this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Email hoặc Mật khẩu không chính xác!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }

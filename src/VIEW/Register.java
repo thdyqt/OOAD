@@ -165,14 +165,4 @@ public class Register extends JFrame {
             JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
-
-    // Giữ nguyên phương thức này như code cũ của bạn
-    private void createCalendarForUser(Connection conn, int userId) {
-        try {
-            String sql = "INSERT INTO Calendars (owner_id) VALUES (?)";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setInt(1, userId);
-            stmt.executeUpdate();
-        } catch (SQLException ignored) {}
-    }
 }

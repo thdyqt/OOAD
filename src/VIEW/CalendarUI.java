@@ -9,20 +9,24 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.List;
 
 public class CalendarUI extends JFrame {
 
     private User currentUser;
     private YearMonth currentYearMonth;
     private LocalDate selectedDate;
-    
+
+    private JComboBox<DTO.Calendar> comboCalendars;
+    private DTO.Calendar currentCalendar;
+
     private JComboBox<String> comboMonth;
     private JSpinner spinYear;
     private JPanel panelDays;
-    
+
     private boolean isUpdatingUI = false;
 
-    private final Color COLOR_PRIMARY = new Color(0, 86, 179); 
+    private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_HOVER = new Color(225, 238, 255);
     private final Color COLOR_SELECTED = new Color(190, 220, 255);
     private final Color COLOR_BG = new Color(248, 250, 252);
@@ -57,10 +61,10 @@ public class CalendarUI extends JFrame {
         JLabel lblMenu = new JLabel("MENU CHÍNH");
         lblMenu.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblMenu.setForeground(Color.GRAY);
-        
+
         RoundedButton btnCalendar = createSidebarButton("Lịch của tôi", true);
         RoundedButton btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
-        RoundedButton btnListReminders = createSidebarButton("Danh sách Nhắc nhở", false);
+        RoundedButton btnListReminders = createSidebarButton("Trung tâm thông báo", false);
 
         panelSidebar.add(lblMenu);
         panelSidebar.add(btnCalendar);
@@ -72,12 +76,31 @@ public class CalendarUI extends JFrame {
         JPanel panelHeader = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
         panelHeader.setBackground(COLOR_BG);
 
+        List<DTO.Calendar> userCalendars = DAL.CalendarDAL.getCalendarsByUserId(currentUser.getUserId());
+        
+        if (userCalendars.isEmpty()) {
+            userCalendars.add(new DTO.Calendar(1, currentUser.getUserId(), "Lịch Mặc Định", "Asia/Ho_Chi_Minh"));
+        }
+
+        comboCalendars = new JComboBox<>(userCalendars.toArray(new DTO.Calendar[0]));
+        comboCalendars.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        comboCalendars.setForeground(COLOR_PRIMARY);
+        comboCalendars.setBackground(Color.WHITE);
+        comboCalendars.setPreferredSize(new Dimension(180, 40));
+
+        currentCalendar = (DTO.Calendar) comboCalendars.getSelectedItem();
+
+        comboCalendars.addActionListener(e -> {
+            currentCalendar = (DTO.Calendar) comboCalendars.getSelectedItem();
+            renderCalendar();
+        });
+
         RoundedButton btnPrev = createNavButton("<");
         RoundedButton btnNext = createNavButton(">");
 
         String[] months = new String[12];
         for (int i = 0; i < 12; i++) months[i] = "Tháng " + (i + 1);
-        
+
         comboMonth = new JComboBox<>(months);
         comboMonth.setFont(new Font("Segoe UI", Font.BOLD, 16));
         comboMonth.setForeground(COLOR_TEXT_DARK);
@@ -96,6 +119,8 @@ public class CalendarUI extends JFrame {
         btnToday.setForeground(Color.WHITE);
         btnToday.setPreferredSize(new Dimension(100, 40));
 
+        panelHeader.add(comboCalendars);
+        panelHeader.add(Box.createHorizontalStrut(10));
         panelHeader.add(btnPrev);
         panelHeader.add(comboMonth);
         panelHeader.add(spinYear);
@@ -110,15 +135,15 @@ public class CalendarUI extends JFrame {
         panelCenter.setBackground(COLOR_BG);
         panelCenter.setBorder(new EmptyBorder(10, 30, 10, 30));
 
-        panelDays = new JPanel(new GridLayout(0, 7, 10, 10)); 
+        panelDays = new JPanel(new GridLayout(0, 7, 10, 10));
         panelDays.setBackground(COLOR_BG);
         panelCenter.add(panelDays, BorderLayout.CENTER);
 
         panelMainContent.add(panelCenter, BorderLayout.CENTER);
 
-        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20)); 
+        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
         panelFooter.setBackground(COLOR_BG);
-        
+
         RoundedButton btnAddAppointment = new RoundedButton("+ Thêm Cuộc Hẹn", 20, COLOR_PRIMARY, 1);
         btnAddAppointment.setFont(new Font("Segoe UI", Font.BOLD, 15));
         btnAddAppointment.setBackground(COLOR_PRIMARY);
@@ -132,20 +157,20 @@ public class CalendarUI extends JFrame {
 
         btnPrev.addActionListener(e -> { currentYearMonth = currentYearMonth.minusMonths(1); renderCalendar(); });
         btnNext.addActionListener(e -> { currentYearMonth = currentYearMonth.plusMonths(1); renderCalendar(); });
-        
-        btnToday.addActionListener(e -> { 
-            currentYearMonth = YearMonth.now(); 
+
+        btnToday.addActionListener(e -> {
+            currentYearMonth = YearMonth.now();
             selectedDate = LocalDate.now();
-            renderCalendar(); 
+            renderCalendar();
         });
 
         comboMonth.addActionListener(e -> jumpToSelectedDate());
         spinYear.addChangeListener(e -> jumpToSelectedDate());
-        
+
         btnAddAppointment.addActionListener(e -> {
-            AddAppointmentWindow addForm = new AddAppointmentWindow(CalendarUI.this, true, currentUser, selectedDate);
+            AddAppointmentWindow addForm = new AddAppointmentWindow(CalendarUI.this, true, currentUser, selectedDate, currentCalendar.getCalendarId());
             addForm.setVisible(true);
-            renderCalendar(); 
+            renderCalendar();
         });
     }
 
@@ -163,7 +188,7 @@ public class CalendarUI extends JFrame {
         btn.setPreferredSize(new Dimension(210, 45));
         btn.setHorizontalAlignment(SwingConstants.LEFT);
         btn.setBorder(new EmptyBorder(0, 15, 0, 0));
-        
+
         if (isActive) {
             btn.setBackground(COLOR_PRIMARY);
             btn.setForeground(Color.WHITE);
@@ -171,7 +196,7 @@ public class CalendarUI extends JFrame {
             btn.setBackground(Color.WHITE);
             btn.setForeground(COLOR_TEXT_DARK);
         }
-        
+
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -207,7 +232,7 @@ public class CalendarUI extends JFrame {
         for (int i = 0; i < daysOfWeek.length; i++) {
             JLabel lblDay = new JLabel(daysOfWeek[i], SwingConstants.CENTER);
             lblDay.setFont(new Font("Segoe UI", Font.BOLD, 14));
-            lblDay.setForeground(i == 0 ? new Color(220, 53, 69) : COLOR_TEXT_DARK); 
+            lblDay.setForeground(i == 0 ? new Color(220, 53, 69) : COLOR_TEXT_DARK);
             panelDays.add(lblDay);
         }
 
@@ -222,12 +247,12 @@ public class CalendarUI extends JFrame {
         int daysInMonth = currentYearMonth.lengthOfMonth();
         for (int day = 1; day <= daysInMonth; day++) {
             RoundedButton btnDay = new RoundedButton(String.valueOf(day), 15, COLOR_BORDER, 1);
-            
+
             LocalDate thisButtonDate = currentYearMonth.atDay(day);
             boolean isSunday = ((paddingDays + day - 1) % 7 == 0);
             boolean isToday = thisButtonDate.equals(LocalDate.now());
             boolean isSelected = thisButtonDate.equals(selectedDate);
-            
+
             if (isToday) {
                 btnDay.setBackground(COLOR_PRIMARY);
                 btnDay.setForeground(Color.WHITE);
@@ -237,7 +262,7 @@ public class CalendarUI extends JFrame {
                 } else {
                     btnDay.setCustomBorder(COLOR_PRIMARY, 1);
                 }
-            } 
+            }
             else if (isSelected) {
                 btnDay.setBackground(COLOR_SELECTED);
                 btnDay.setForeground(COLOR_PRIMARY);
@@ -246,15 +271,15 @@ public class CalendarUI extends JFrame {
             }
             else {
                 btnDay.setBackground(Color.WHITE);
-                btnDay.setForeground(isSunday ? new Color(220, 53, 69) : COLOR_TEXT_DARK); 
+                btnDay.setForeground(isSunday ? new Color(220, 53, 69) : COLOR_TEXT_DARK);
                 btnDay.setFont(new Font("Segoe UI", Font.BOLD, 18));
                 btnDay.setCustomBorder(COLOR_BORDER, 1);
             }
-            
+
             btnDay.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseEntered(MouseEvent e) {
-                    if (!isToday && !isSelected) btnDay.setBackground(COLOR_HOVER); 
+                    if (!isToday && !isSelected) btnDay.setBackground(COLOR_HOVER);
                 }
                 @Override
                 public void mouseExited(MouseEvent e) {
@@ -275,11 +300,12 @@ public class CalendarUI extends JFrame {
     }
 
     public static void main(String[] args) {
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } 
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
         catch (Exception ex) {}
-        
+
         SwingUtilities.invokeLater(() -> {
             User mockUser = new User();
+            mockUser.setUserId(1);
             mockUser.setUsername("Dev Test");
             new CalendarUI(mockUser).setVisible(true);
         });
