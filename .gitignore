@@ -1,0 +1,10 @@
+# Thư mục build và file biên dịch của NetBeans
+build/
+dist/
+nbproject/private/
+*.class
+*.jar
+
+# Bỏ qua các file cấu hình hệ điều hành
+.DS_Store
+Thumbs.db
