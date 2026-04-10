@@ -79,7 +79,7 @@ public class Appointment {
         this.endTime = endTime;
     }
 
-    public boolean isIsGroupMeeting() {
+    public boolean isGroupMeeting() {
         return isGroupMeeting;
     }
 
