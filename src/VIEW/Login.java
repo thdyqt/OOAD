@@ -1,6 +1,6 @@
 package VIEW;
 
-import BLL.UserBLL;
+import BLL.UserManager;
 import DAL.DBConnection;
 import DTO.User;
 
@@ -57,7 +57,7 @@ public class Login extends JFrame {
             this.dispose();
         });
     }
-    private UserBLL userBLL = new UserBLL();
+    private UserManager userBLL = new UserManager();
 
     private void handleLogin() {
         String email = txtEmail.getText().trim();

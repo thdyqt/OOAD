@@ -1,6 +1,6 @@
 package VIEW;
 
-import BLL.UserBLL;
+import BLL.UserManager;
 import DAL.DBConnection;
 import java.awt.*;
 import java.sql.*;
@@ -63,7 +63,7 @@ public class Register extends JFrame {
         });
     }
 
-    private UserBLL userBLL = new UserBLL();
+    private UserManager userBLL = new UserManager();
 
     private void handleRegister() {
         String username = txtUsername.getText().trim();
