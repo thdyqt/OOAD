@@ -1,70 +1,130 @@
 package VIEW;
 
 import BLL.UserManager;
-import DAL.DBConnection;
 import DTO.User;
 
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class Login extends JFrame {
 
     private JTextField txtEmail;
     private JPasswordField txtPassword;
-    private JButton btnLogin;
-    private JButton btnGoToRegister;
+    private RoundedButton btnLogin;
+    private RoundedButton btnGoToRegister;
+
+    // Định nghĩa các màu sắc đồng bộ với hệ thống
+    private final Color COLOR_PRIMARY = new Color(0, 86, 179);
+    private final Color COLOR_BG = Color.WHITE;
+    private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
+    private final Color COLOR_BORDER = new Color(210, 215, 220);
+
+    private UserManager userBLL = new UserManager();
 
     public Login() {
         setTitle("Đăng nhập hệ thống Calendar");
-        setSize(600, 250);
+        setSize(450, 350); // Cập nhật lại kích thước cho cân đối
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        setResizable(false);
+        getContentPane().setBackground(COLOR_BG);
         setLayout(new BorderLayout());
 
+        initComponents();
+    }
+
+    private void initComponents() {
+        // --- HEADER ---
+        JPanel panelHeader = new JPanel();
+        panelHeader.setBackground(COLOR_BG);
+        panelHeader.setBorder(new EmptyBorder(30, 0, 10, 0));
 
         JLabel lblTitle = new JLabel("ĐĂNG NHẬP", SwingConstants.CENTER);
-        lblTitle.setFont(new Font("Arial", Font.BOLD, 20));
-        lblTitle.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        add(lblTitle, BorderLayout.NORTH);
+        lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        lblTitle.setForeground(COLOR_PRIMARY);
+        panelHeader.add(lblTitle);
 
+        add(panelHeader, BorderLayout.NORTH);
 
-        JPanel panelCenter = new JPanel(new GridLayout(2, 2, 10, 10));
-        panelCenter.setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
+        // --- FORM CENTER ---
+        JPanel panelForm = new JPanel(new GridBagLayout());
+        panelForm.setBackground(COLOR_BG);
+        panelForm.setBorder(new EmptyBorder(10, 40, 20, 40));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 0, 10, 15);
 
-        panelCenter.add(new JLabel("Email:"));
+        // Email Label & Field
+        gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.3;
+        JLabel lblEmail = new JLabel("Email:");
+        lblEmail.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblEmail.setForeground(COLOR_TEXT_DARK);
+        panelForm.add(lblEmail, gbc);
+
+        gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 0.7;
         txtEmail = new JTextField();
-        panelCenter.add(txtEmail);
+        styleTextField(txtEmail);
+        panelForm.add(txtEmail, gbc);
 
-        panelCenter.add(new JLabel("Mật khẩu:"));
+        // Password Label & Field
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.3;
+        JLabel lblPassword = new JLabel("Mật khẩu:");
+        lblPassword.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblPassword.setForeground(COLOR_TEXT_DARK);
+        panelForm.add(lblPassword, gbc);
+
+        gbc.gridx = 1; gbc.gridy = 1; gbc.weightx = 0.7;
         txtPassword = new JPasswordField();
-        panelCenter.add(txtPassword);
+        styleTextField(txtPassword);
+        panelForm.add(txtPassword, gbc);
 
-        add(panelCenter, BorderLayout.CENTER);
+        add(panelForm, BorderLayout.CENTER);
 
+        // --- FOOTER BUTTONS ---
+        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 20));
+        panelFooter.setBackground(COLOR_BG);
 
-        JPanel panelBottom = new JPanel();
-        btnLogin = new JButton("Đăng nhập");
-        btnGoToRegister = new JButton("Chưa có tài khoản? Đăng ký ngay");
+        btnLogin = new RoundedButton("Đăng nhập", 12, COLOR_PRIMARY, 1);
+        btnLogin.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btnLogin.setBackground(COLOR_PRIMARY);
+        btnLogin.setForeground(Color.WHITE);
+        btnLogin.setPreferredSize(new Dimension(150, 45));
 
-        panelBottom.add(btnLogin);
-        panelBottom.add(btnGoToRegister);
-        add(panelBottom, BorderLayout.SOUTH);
+        btnGoToRegister = new RoundedButton("Chưa có tài khoản?", 12, COLOR_BORDER, 1);
+        btnGoToRegister.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnGoToRegister.setBackground(Color.WHITE);
+        btnGoToRegister.setForeground(COLOR_PRIMARY);
+        btnGoToRegister.setPreferredSize(new Dimension(170, 45));
 
+        panelFooter.add(btnLogin);
+        panelFooter.add(btnGoToRegister);
 
+        add(panelFooter, BorderLayout.SOUTH);
+
+        // Events
         btnLogin.addActionListener(e -> handleLogin());
         btnGoToRegister.addActionListener(e -> {
             new Register().setVisible(true);
             this.dispose();
         });
     }
-    private UserManager userBLL = new UserManager();
+
+    private void styleTextField(JTextField txt) {
+        txt.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        txt.setPreferredSize(new Dimension(200, 40));
+        txt.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(COLOR_BORDER, 1),
+                BorderFactory.createEmptyBorder(5, 10, 5, 10)
+        ));
+    }
 
     private void handleLogin() {
         String email = txtEmail.getText().trim();
         String password = new String(txtPassword.getPassword());
 
         if (email.isEmpty() || password.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Email và Mật khẩu!");
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Email và Mật khẩu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -72,12 +132,17 @@ public class Login extends JFrame {
 
         if (loggedInUser != null) {
             JOptionPane.showMessageDialog(this, "Đăng nhập thành công! Xin chào " + loggedInUser.getUsername());
+            // Mở CalendarUI sau khi login thành công (nếu cần thiết tích hợp luôn ở đây)
+            // new CalendarUI(loggedInUser).setVisible(true);
+            // this.dispose();
         } else {
             JOptionPane.showMessageDialog(this, "Email hoặc Mật khẩu không chính xác!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public static void main(String[] args) {
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+        catch (Exception ex) {}
         SwingUtilities.invokeLater(() -> new Login().setVisible(true));
     }
 }
