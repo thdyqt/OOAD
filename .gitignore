@@ -8,3 +8,5 @@ nbproject/private/
 # Bỏ qua các file cấu hình hệ điều hành
 .DS_Store
 Thumbs.db
+
+**/DBConnection.java
