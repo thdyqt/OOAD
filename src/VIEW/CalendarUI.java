@@ -1,13 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package VIEW;
-
-/**
- *
- * @author Admin
- */
 
 import DTO.User;
 
@@ -20,8 +11,10 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 
 public class CalendarUI extends JFrame {
+
     private User currentUser;
     private YearMonth currentYearMonth;
+    private LocalDate selectedDate;
     
     private JComboBox<String> comboMonth;
     private JSpinner spinYear;
@@ -29,8 +22,9 @@ public class CalendarUI extends JFrame {
     
     private boolean isUpdatingUI = false;
 
-    private final Color COLOR_PRIMARY = new Color(13, 110, 253);
-    private final Color COLOR_HOVER = new Color(230, 240, 255);
+    private final Color COLOR_PRIMARY = new Color(0, 86, 179); 
+    private final Color COLOR_HOVER = new Color(225, 238, 255);
+    private final Color COLOR_SELECTED = new Color(190, 220, 255);
     private final Color COLOR_BG = new Color(248, 250, 252);
     private final Color COLOR_TEXT_DARK = new Color(33, 37, 41);
     private final Color COLOR_BORDER = new Color(226, 232, 240);
@@ -38,9 +32,10 @@ public class CalendarUI extends JFrame {
     public CalendarUI(User user) {
         this.currentUser = user;
         this.currentYearMonth = YearMonth.now();
+        this.selectedDate = LocalDate.now();
 
         setTitle("Appointment Calendar");
-        setSize(1100, 650);
+        setSize(1150, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
@@ -51,50 +46,41 @@ public class CalendarUI extends JFrame {
     }
 
     private void initComponents() {
-        JPanel panelSidebar = new JPanel();
-        panelSidebar.setLayout(new BoxLayout(panelSidebar, BoxLayout.Y_AXIS));
+        JPanel panelSidebar = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 15));
         panelSidebar.setBackground(Color.WHITE);
-        panelSidebar.setPreferredSize(new Dimension(250, 0));
+        panelSidebar.setPreferredSize(new Dimension(240, 0));
         panelSidebar.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(0, 0, 0, 1, COLOR_BORDER),
-                new EmptyBorder(20, 15, 20, 15)
+                new EmptyBorder(20, 10, 20, 10)
         ));
 
         JLabel lblMenu = new JLabel("MENU CHÍNH");
-        lblMenu.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblMenu.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblMenu.setForeground(Color.GRAY);
-        lblMenu.setAlignmentX(Component.CENTER_ALIGNMENT);
         
-        JButton btnCalendar = createSidebarButton("Lịch của tôi");
-        btnCalendar.setBackground(COLOR_HOVER);
-        btnCalendar.setForeground(COLOR_PRIMARY);
-
-        JButton btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn");
-        JButton btnListReminders = createSidebarButton("Danh sách Nhắc nhở");
+        RoundedButton btnCalendar = createSidebarButton("Lịch của tôi", true);
+        RoundedButton btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
+        RoundedButton btnListReminders = createSidebarButton("Danh sách Nhắc nhở", false);
 
         panelSidebar.add(lblMenu);
-        panelSidebar.add(Box.createVerticalStrut(20));
         panelSidebar.add(btnCalendar);
-        panelSidebar.add(Box.createVerticalStrut(10));
         panelSidebar.add(btnListAppointments);
-        panelSidebar.add(Box.createVerticalStrut(10));
         panelSidebar.add(btnListReminders);
 
         add(panelSidebar, BorderLayout.WEST);
 
         JPanel panelHeader = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
-        panelHeader.setBackground(Color.WHITE);
-        panelHeader.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, COLOR_BORDER));
+        panelHeader.setBackground(COLOR_BG);
 
-        JButton btnPrev = createNavButton("<");
-        JButton btnNext = createNavButton(">");
+        RoundedButton btnPrev = createNavButton("<");
+        RoundedButton btnNext = createNavButton(">");
 
         String[] months = new String[12];
         for (int i = 0; i < 12; i++) months[i] = "Tháng " + (i + 1);
         
         comboMonth = new JComboBox<>(months);
         comboMonth.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        comboMonth.setForeground(COLOR_PRIMARY);
+        comboMonth.setForeground(COLOR_TEXT_DARK);
         comboMonth.setBackground(Color.WHITE);
         comboMonth.setPreferredSize(new Dimension(130, 40));
 
@@ -104,14 +90,11 @@ public class CalendarUI extends JFrame {
         spinYear.setFont(new Font("Segoe UI", Font.BOLD, 16));
         spinYear.setPreferredSize(new Dimension(90, 40));
 
-        JButton btnToday = new JButton("Hôm nay");
+        RoundedButton btnToday = new RoundedButton("Hôm nay", 10, COLOR_PRIMARY, 1);
         btnToday.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnToday.setBackground(Color.WHITE);
-        btnToday.setForeground(COLOR_PRIMARY);
-        btnToday.setFocusPainted(false);
-        btnToday.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnToday.setBackground(COLOR_PRIMARY);
+        btnToday.setForeground(Color.WHITE);
         btnToday.setPreferredSize(new Dimension(100, 40));
-        btnToday.setBorder(BorderFactory.createLineBorder(COLOR_PRIMARY, 1));
 
         panelHeader.add(btnPrev);
         panelHeader.add(comboMonth);
@@ -125,26 +108,41 @@ public class CalendarUI extends JFrame {
 
         JPanel panelCenter = new JPanel(new BorderLayout());
         panelCenter.setBackground(COLOR_BG);
-        panelCenter.setBorder(new EmptyBorder(20, 30, 30, 30));
+        panelCenter.setBorder(new EmptyBorder(10, 30, 10, 30));
 
         panelDays = new JPanel(new GridLayout(0, 7, 10, 10)); 
         panelDays.setBackground(COLOR_BG);
         panelCenter.add(panelDays, BorderLayout.CENTER);
 
         panelMainContent.add(panelCenter, BorderLayout.CENTER);
+
+        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20)); 
+        panelFooter.setBackground(COLOR_BG);
+        
+        RoundedButton btnAddAppointment = new RoundedButton("+ Thêm Cuộc Hẹn", 20, COLOR_PRIMARY, 1);
+        btnAddAppointment.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btnAddAppointment.setBackground(COLOR_PRIMARY);
+        btnAddAppointment.setForeground(Color.WHITE);
+        btnAddAppointment.setPreferredSize(new Dimension(200, 45));
+
+        panelFooter.add(btnAddAppointment);
+        panelMainContent.add(panelFooter, BorderLayout.SOUTH);
+
         add(panelMainContent, BorderLayout.CENTER);
 
         btnPrev.addActionListener(e -> { currentYearMonth = currentYearMonth.minusMonths(1); renderCalendar(); });
         btnNext.addActionListener(e -> { currentYearMonth = currentYearMonth.plusMonths(1); renderCalendar(); });
-        btnToday.addActionListener(e -> { currentYearMonth = YearMonth.now(); renderCalendar(); });
+        
+        btnToday.addActionListener(e -> { 
+            currentYearMonth = YearMonth.now(); 
+            selectedDate = LocalDate.now();
+            renderCalendar(); 
+        });
 
         comboMonth.addActionListener(e -> jumpToSelectedDate());
         spinYear.addChangeListener(e -> jumpToSelectedDate());
-
-        btnListAppointments.addActionListener(e -> {
-        });
         
-        btnListReminders.addActionListener(e -> {
+        btnAddAppointment.addActionListener(e -> {
         });
     }
 
@@ -156,43 +154,41 @@ public class CalendarUI extends JFrame {
         renderCalendar();
     }
 
-    private JButton createSidebarButton(String text) {
-        JButton btn = new JButton(text);
+    private RoundedButton createSidebarButton(String text, boolean isActive) {
+        RoundedButton btn = new RoundedButton(text, 12, isActive ? COLOR_PRIMARY : Color.WHITE, 1);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btn.setForeground(COLOR_TEXT_DARK);
-        btn.setBackground(Color.WHITE);
-        btn.setFocusPainted(false);
-        btn.setBorderPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(210, 45));
         btn.setHorizontalAlignment(SwingConstants.LEFT);
-        btn.setMaximumSize(new Dimension(Integer.MAX_VALUE, 45)); 
+        btn.setBorder(new EmptyBorder(0, 15, 0, 0));
+        
+        if (isActive) {
+            btn.setBackground(COLOR_PRIMARY);
+            btn.setForeground(Color.WHITE);
+        } else {
+            btn.setBackground(Color.WHITE);
+            btn.setForeground(COLOR_TEXT_DARK);
+        }
         
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (btn.getBackground() != COLOR_HOVER) {
-                    btn.setBackground(new Color(240, 240, 240));
-                }
+                if (!isActive) btn.setBackground(COLOR_HOVER);
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                if (btn.getForeground() != COLOR_PRIMARY) {
-                    btn.setBackground(Color.WHITE);
-                }
+                if (!isActive) btn.setBackground(Color.WHITE);
             }
         });
         return btn;
     }
 
-    private JButton createNavButton(String text) {
-        JButton btn = new JButton(text);
+    private RoundedButton createNavButton(String text) {
+        RoundedButton btn = new RoundedButton(text, 10, COLOR_PRIMARY, 1);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 18));
-        btn.setBackground(Color.WHITE);
-        btn.setForeground(COLOR_PRIMARY);
-        btn.setFocusPainted(false);
-        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setPreferredSize(new Dimension(40, 40));
-        btn.setBorder(BorderFactory.createLineBorder(COLOR_BORDER));
+        btn.setBackground(COLOR_PRIMARY);
+        btn.setForeground(Color.WHITE);
+        btn.setMargin(new Insets(0, 0, 0, 0));
+        btn.setPreferredSize(new Dimension(50, 40));
         return btn;
     }
 
@@ -222,43 +218,50 @@ public class CalendarUI extends JFrame {
 
         int daysInMonth = currentYearMonth.lengthOfMonth();
         for (int day = 1; day <= daysInMonth; day++) {
-            JButton btnDay = new JButton(String.valueOf(day));
-            btnDay.setFont(new Font("Segoe UI", Font.BOLD, 18));
-            btnDay.setFocusPainted(false);
-            btnDay.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            RoundedButton btnDay = new RoundedButton(String.valueOf(day), 15, COLOR_BORDER, 1);
             
+            LocalDate thisButtonDate = currentYearMonth.atDay(day);
             boolean isSunday = ((paddingDays + day - 1) % 7 == 0);
+            boolean isToday = thisButtonDate.equals(LocalDate.now());
+            boolean isSelected = thisButtonDate.equals(selectedDate);
             
-            if (currentYearMonth.equals(YearMonth.now()) && day == LocalDate.now().getDayOfMonth()) {
-                btnDay.setForeground(COLOR_PRIMARY);
+            if (isToday) {
+                btnDay.setBackground(COLOR_PRIMARY);
+                btnDay.setForeground(Color.WHITE);
                 btnDay.setFont(new Font("Segoe UI", Font.BOLD, 22));
-                btnDay.setBackground(new Color(240, 248, 255));
-                
-                btnDay.setBorder(BorderFactory.createCompoundBorder(
-                        BorderFactory.createLineBorder(COLOR_PRIMARY, 3),
-                        new EmptyBorder(5, 5, 5, 5)
-                ));
-            } else {
-                btnDay.setForeground(isSunday ? new Color(220, 53, 69) : COLOR_TEXT_DARK);
-                btnDay.setBackground(Color.WHITE);
-                btnDay.setBorder(BorderFactory.createLineBorder(COLOR_BORDER, 1));
-                
-                btnDay.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseEntered(MouseEvent e) {
-                        btnDay.setBackground(COLOR_HOVER);
-                    }
-                    @Override
-                    public void mouseExited(MouseEvent e) {
-                        btnDay.setBackground(Color.WHITE);
-                    }
-                });
+                if (isSelected) {
+                    btnDay.setCustomBorder(Color.BLACK, 2);
+                } else {
+                    btnDay.setCustomBorder(COLOR_PRIMARY, 1);
+                }
+            } 
+            else if (isSelected) {
+                btnDay.setBackground(COLOR_SELECTED);
+                btnDay.setForeground(COLOR_PRIMARY);
+                btnDay.setFont(new Font("Segoe UI", Font.BOLD, 20));
+                btnDay.setCustomBorder(COLOR_PRIMARY, 2);
             }
+            else {
+                btnDay.setBackground(Color.WHITE);
+                btnDay.setForeground(isSunday ? new Color(220, 53, 69) : COLOR_TEXT_DARK); 
+                btnDay.setFont(new Font("Segoe UI", Font.BOLD, 18));
+                btnDay.setCustomBorder(COLOR_BORDER, 1);
+            }
+            
+            btnDay.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    if (!isToday && !isSelected) btnDay.setBackground(COLOR_HOVER); 
+                }
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    if (!isToday && !isSelected) btnDay.setBackground(Color.WHITE);
+                }
+            });
 
-            final int selectedDay = day;
             btnDay.addActionListener(e -> {
-                LocalDate selectedDate = currentYearMonth.atDay(selectedDay);
-                System.out.println("Chuẩn bị thêm lịch cho ngày: " + selectedDate);
+                selectedDate = thisButtonDate;
+                renderCalendar();
             });
 
             panelDays.add(btnDay);
@@ -268,9 +271,53 @@ public class CalendarUI extends JFrame {
         panelDays.repaint();
     }
 
+    class RoundedButton extends JButton {
+        private int radius;
+        private Color borderColor;
+        private int borderThickness;
+
+        public RoundedButton(String text, int radius, Color borderColor, int borderThickness) {
+            super(text);
+            this.radius = radius;
+            this.borderColor = borderColor;
+            this.borderThickness = borderThickness;
+            setContentAreaFilled(false);
+            setFocusPainted(false);
+            setBorderPainted(false);
+        }
+
+        public void setCustomBorder(Color color, int thickness) {
+            this.borderColor = color;
+            this.borderThickness = thickness;
+            repaint();
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRoundRect(0, 0, getWidth(), getHeight(), radius, radius);
+            super.paintComponent(g);
+            g2.dispose();
+        }
+
+        @Override
+        protected void paintBorder(Graphics g) {
+            if (borderColor != null && borderThickness > 0) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(borderColor);
+                g2.setStroke(new BasicStroke(borderThickness));
+                g2.drawRoundRect(borderThickness / 2, borderThickness / 2, getWidth() - borderThickness, getHeight() - borderThickness, radius, radius);
+                g2.dispose();
+            }
+        }
+    }
+
     public static void main(String[] args) {
         try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); } 
-        catch (Exception ex) { ex.printStackTrace(); }
+        catch (Exception ex) {}
         
         SwingUtilities.invokeLater(() -> {
             User mockUser = new User();
