@@ -26,6 +26,10 @@ public class CalendarUI extends JFrame {
 
     private boolean isUpdatingUI = false;
 
+    private CardLayout cardLayout;
+    private JPanel cardPanel;
+    private AppointmentListPanel appointmentListPanel;
+
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_HOVER = new Color(225, 238, 255);
     private final Color COLOR_SELECTED = new Color(190, 220, 255);
@@ -153,7 +157,60 @@ public class CalendarUI extends JFrame {
         panelFooter.add(btnAddAppointment);
         panelMainContent.add(panelFooter, BorderLayout.SOUTH);
 
-        add(panelMainContent, BorderLayout.CENTER);
+        // --- SỰ KIỆN CLICK CHO MENU BÊN TRÁI ---
+        btnCalendar.addActionListener(e -> {
+            cardLayout.show(cardPanel, "CALENDAR_VIEW");
+            renderCalendar(); // Refresh lại lịch
+
+            // Set nút Lịch thành Active (Đổi nền, chữ, viền)
+            btnCalendar.setBackground(COLOR_PRIMARY);
+            btnCalendar.setForeground(Color.WHITE);
+            btnCalendar.setCustomBorder(COLOR_PRIMARY, 1);
+
+            // Reset nút Danh sách về bình thường
+            btnListAppointments.setBackground(Color.WHITE);
+            btnListAppointments.setForeground(COLOR_TEXT_DARK);
+            btnListAppointments.setCustomBorder(Color.WHITE, 1);
+
+            // Reset nút Thông báo về bình thường (nếu có dùng)
+            btnListReminders.setBackground(Color.WHITE);
+            btnListReminders.setForeground(COLOR_TEXT_DARK);
+            btnListReminders.setCustomBorder(Color.WHITE, 1);
+        });
+
+        btnListAppointments.addActionListener(e -> {
+            appointmentListPanel.loadData(); // Load data mới nhất từ Database
+            cardLayout.show(cardPanel, "LIST_VIEW");
+
+            // Set nút Danh sách thành Active (Đổi nền, chữ, viền)
+            btnListAppointments.setBackground(COLOR_PRIMARY);
+            btnListAppointments.setForeground(Color.WHITE);
+            btnListAppointments.setCustomBorder(COLOR_PRIMARY, 1);
+
+            // Reset nút Lịch về bình thường
+            btnCalendar.setBackground(Color.WHITE);
+            btnCalendar.setForeground(COLOR_TEXT_DARK);
+            btnCalendar.setCustomBorder(Color.WHITE, 1);
+
+            // Reset nút Thông báo về bình thường
+            btnListReminders.setBackground(Color.WHITE);
+            btnListReminders.setForeground(COLOR_TEXT_DARK);
+            btnListReminders.setCustomBorder(Color.WHITE, 1);
+        });
+
+        // --- THAY THẾ BẰNG ĐOẠN SAU ---
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+
+        appointmentListPanel = new AppointmentListPanel(currentUser);
+
+        // Thêm cả panel Lịch và panel Danh sách vào CardLayout
+        cardPanel.add(panelMainContent, "CALENDAR_VIEW");
+        cardPanel.add(appointmentListPanel, "LIST_VIEW");
+
+        // Đưa cardPanel ra giữa màn hình
+        add(cardPanel, BorderLayout.CENTER);
+
 
         btnPrev.addActionListener(e -> { currentYearMonth = currentYearMonth.minusMonths(1); renderCalendar(); });
         btnNext.addActionListener(e -> { currentYearMonth = currentYearMonth.plusMonths(1); renderCalendar(); });
@@ -200,11 +257,17 @@ public class CalendarUI extends JFrame {
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (!isActive) btn.setBackground(COLOR_HOVER);
+                // Kiểm tra nếu nút đang KHÔNG được chọn (màu nền không phải xanh) thì mới hover màu nhạt
+                if (!btn.getBackground().equals(COLOR_PRIMARY)) {
+                    btn.setBackground(COLOR_HOVER);
+                }
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                if (!isActive) btn.setBackground(Color.WHITE);
+                // Khi chuột rời đi, nếu nút đang KHÔNG được chọn thì trả về màu trắng
+                if (!btn.getBackground().equals(COLOR_PRIMARY)) {
+                    btn.setBackground(Color.WHITE);
+                }
             }
         });
         return btn;
