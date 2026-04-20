@@ -68,7 +68,14 @@ public class CalendarUI extends JFrame {
 
         RoundedButton btnCalendar = createSidebarButton("Lịch của tôi", true);
         RoundedButton btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
+
+        //i suppose this is my part?
+        //purpose: show all reminders whose time remaining before their dates is less than 24 hours
         RoundedButton btnListReminders = createSidebarButton("Trung tâm thông báo", false);
+        btnListReminders.addActionListener(actionEvent -> {
+            Central centralWindow = new Central();
+            centralWindow.setVisible(true);
+        });
 
         panelSidebar.add(lblMenu);
         panelSidebar.add(btnCalendar);
