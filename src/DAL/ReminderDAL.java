@@ -25,31 +25,38 @@ public class ReminderDAL {
         }
     }
 
+    //for central
     //get all reminders whose remaining time before target_time is 24 hours or less
-    public static List<Reminder> getAllReminder_24Hours(){
-        List<Reminder> results = new ArrayList<>();
-        String sql = "SELECT * FROM Reminders WHERE target_time >= NOW() " +
-                "AND target_time <= DATE_ADD(NOW(), INTERVAL 1 DAY) " +
-                "ORDER BY target_time ASC";
+    public static List<Reminder> getAllReminder_24Hours(int userId) {
+        java.util.List<Reminder> list = new java.util.ArrayList<>();
 
-        try
-                (Connection conn = DBConnection.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(sql);
-                 ResultSet rs = stmt.executeQuery())
-        {
-            while (rs.next()){
-                Reminder reminder = new Reminder(
-                        rs.getInt("reminder_id"),
-                        rs.getInt("appointment_id"),
-                        rs.getString("reminder_type"),
-                        rs.getTimestamp("target_time").toLocalDateTime(),
-                        rs.getString("message")
-                );
-                results.add(reminder);
+        String sql = "SELECT r.* FROM Reminders r\n" +
+                "JOIN Appointments a ON r.appointment_id = a.appointment_id\n" +
+                "JOIN Calendars c ON a.calendar_id = c.calendar_id\n" +
+                "WHERE c.owner_id = ? \n" +
+                "AND r.target_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY) " +
+                "ORDER BY r.target_time ASC";
+
+
+        try (Connection conn = DBConnection.getConnection();
+             java.sql.PreparedStatement stmt = conn.prepareStatement(sql)) {
+            //pass user id into the query
+            stmt.setInt(1, userId);
+
+            try (java.sql.ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    list.add(new Reminder(
+                            rs.getInt("reminder_id"),
+                            rs.getInt("appointment_id"),
+                            rs.getString("reminder_type"),
+                            rs.getTimestamp("target_time").toLocalDateTime(),
+                            rs.getString("message")
+                    ));
+                }
             }
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-        return results;
+        return list;
     }
 }

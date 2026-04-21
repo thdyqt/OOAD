@@ -43,8 +43,9 @@ public class ReminderManager {
         }
     }
 
-    public static List<Reminder> getReminder_24H(){
-        return ReminderDAL.getAllReminder_24Hours();
+    //for central
+    public static List<Reminder> getReminder_24H(int userID){
+        return ReminderDAL.getAllReminder_24Hours(userID);
     }
 
 }
