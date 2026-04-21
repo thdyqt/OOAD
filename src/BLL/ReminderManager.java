@@ -4,9 +4,17 @@
  */
 package BLL;
 
+import DAL.DBConnection;
 import DAL.ReminderDAL;
 import DTO.Reminder;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -34,4 +42,10 @@ public class ReminderManager {
             return "Lỗi hệ thống: Không thể lưu nhắc nhở vào cơ sở dữ liệu.";
         }
     }
+
+    //for central
+    public static List<Reminder> getReminder_24H(int userID){
+        return ReminderDAL.getAllReminder_24Hours(userID);
+    }
+
 }

@@ -13,6 +13,8 @@ import java.util.List;
 
 public class CalendarUI extends JFrame {
 
+    private Central centralWindow = null;
+
     private User currentUser;
     private YearMonth currentYearMonth;
     private LocalDate selectedDate;
@@ -68,6 +70,9 @@ public class CalendarUI extends JFrame {
 
         RoundedButton btnCalendar = createSidebarButton("Lịch của tôi", true);
         RoundedButton btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
+
+        //i suppose this is my part?
+        //purpose: show all reminders whose time remaining before their dates is less than 24 hours
         RoundedButton btnListReminders = createSidebarButton("Trung tâm thông báo", false);
 
         panelSidebar.add(lblMenu);
@@ -198,15 +203,41 @@ public class CalendarUI extends JFrame {
             btnListReminders.setCustomBorder(Color.WHITE, 1);
         });
 
+        //SUNNY'S PART
+        Central centralPanel = new Central(currentUser.getUserId());
+        btnListReminders.addActionListener(e -> {
+            //refresh
+            centralPanel.refreshReminders();
+            //change view
+            cardLayout.show(cardPanel, "REMINDER_VIEW");
+
+            //set selected buttons as active
+            btnListReminders.setBackground(COLOR_PRIMARY);
+            btnListReminders.setForeground(Color.WHITE);
+            btnListReminders.setCustomBorder(COLOR_PRIMARY, 1);
+
+            //set unactive buttons
+            btnCalendar.setBackground(Color.WHITE);
+            btnCalendar.setForeground(COLOR_TEXT_DARK);
+            btnCalendar.setCustomBorder(Color.WHITE, 1);
+
+            btnListAppointments.setBackground(Color.WHITE);
+            btnListAppointments.setForeground(COLOR_TEXT_DARK);
+            btnListAppointments.setCustomBorder(Color.WHITE, 1);
+        });
+
         // --- THAY THẾ BẰNG ĐOẠN SAU ---
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
+
 
         appointmentListPanel = new AppointmentListPanel(currentUser);
 
         // Thêm cả panel Lịch và panel Danh sách vào CardLayout
         cardPanel.add(panelMainContent, "CALENDAR_VIEW");
         cardPanel.add(appointmentListPanel, "LIST_VIEW");
+        cardPanel.add(centralPanel, "REMINDER_VIEW");
+
 
         // Đưa cardPanel ra giữa màn hình
         add(cardPanel, BorderLayout.CENTER);
