@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ReminderDialog extends JDialog {
-
     private JComboBox<String> comboTime;
     private JTextField txtMessage;
     private RoundedButton btnSave;

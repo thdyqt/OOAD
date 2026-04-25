@@ -8,7 +8,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Login extends JFrame {
-
     private JTextField txtEmail;
     private JPasswordField txtPassword;
     private RoundedButton btnLogin;

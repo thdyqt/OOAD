@@ -392,16 +392,4 @@ public class CalendarUI extends JFrame {
         panelDays.revalidate();
         panelDays.repaint();
     }
-
-    public static void main(String[] args) {
-        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
-        catch (Exception ex) {}
-
-        SwingUtilities.invokeLater(() -> {
-            User mockUser = new User();
-            mockUser.setUserId(1);
-            mockUser.setUsername("Dev Test");
-            new CalendarUI(mockUser).setVisible(true);
-        });
-    }
 }

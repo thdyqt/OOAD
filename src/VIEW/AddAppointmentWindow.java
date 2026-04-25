@@ -205,27 +205,73 @@ public class AddAppointmentWindow extends JDialog {
         int endH = (int) spinEndHour.getValue();
         int endM = (int) spinEndMinute.getValue();
         boolean isGroup = chkGroup.isSelected();
-        
+
+        if (name.isEmpty() || location.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Tên và Địa điểm!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         LocalDateTime startTime = selectedDate.atTime(startH, startM);
         LocalDateTime endTime = selectedDate.atTime(endH, endM);
-        
-        DTO.Appointment newAppointment = new DTO.Appointment();
-        newAppointment.setCalendarId(currentCalendarId); 
+
+        if (!startTime.isBefore(endTime)) {
+            JOptionPane.showMessageDialog(this, "Giờ kết thúc phải diễn ra sau giờ bắt đầu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Appointment newAppointment = new Appointment();
+        newAppointment.setCalendarId(currentCalendarId);
         newAppointment.setName(name);
         newAppointment.setLocation(location);
         newAppointment.setStartTime(startTime);
         newAppointment.setEndTime(endTime);
         newAppointment.setIsGroupMeeting(isGroup);
 
-        String result = AppointmentManager.addAppointment(newAppointment);
-        
-        if (result == "SUCCESS"){
-           ReminderDialog dialog = new ReminderDialog(AddAppointmentWindow.this, true, newAppointment);
-           this.dispose();
+        Appointment existingGroup = AppointmentManager.checkGroupMeeting(currentCalendarId, name, startTime, endTime);
+        if (existingGroup != null) {
+            int choice = JOptionPane.showConfirmDialog(this,
+                    "Hệ thống phát hiện một Cuộc họp nhóm đang diễn ra với cùng tên và thời gian.\nBạn có muốn THAM GIA vào cuộc họp này thay vì tạo mới không?",
+                    "Xác nhận tham gia nhóm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            
+            if (choice == JOptionPane.YES_OPTION) {
+                boolean joined = BLL.AppointmentManager.joinExistingMeeting(existingGroup.getAppointmentId(), currentUser.getUserId());
+                if (joined) {
+                    JOptionPane.showMessageDialog(this, "Bạn đã được thêm vào danh sách thành viên của cuộc họp nhóm!");
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Lỗi: Không thể tham gia nhóm lúc này.", "Lỗi hệ thống", JOptionPane.ERROR_MESSAGE);
+                }
+                return; 
+            }
         }
-        else{
-            JOptionPane.showMessageDialog(rootPane, result, "Lỗi", JOptionPane.WARNING_MESSAGE); 
+
+        Appointment conflictAppt = BLL.AppointmentManager.checkTimeConflict(currentCalendarId, startTime, endTime);
+        if (conflictAppt != null) {
+            int choice = JOptionPane.showConfirmDialog(this,
+                    "Bạn đã có cuộc hẹn: [" + conflictAppt.getName() + "] trong khung giờ này!\n\nBạn muốn GHI ĐÈ (thay thế) cuộc hẹn cũ bằng cuộc hẹn này không?\nChọn 'No' để ở lại và chọn khung giờ khác.",
+                    "Trùng Lịch - Cảnh báo", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            
+            if (choice == JOptionPane.YES_OPTION) {
+                boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), newAppointment);
+                if (replaced) {
+                    ReminderDialog dialog = new ReminderDialog(AddAppointmentWindow.this, true, newAppointment);
+                    dialog.setVisible(true);
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Lỗi: Không thể ghi đè cuộc hẹn.", "Lỗi hệ thống", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            return; 
         }
-         
+
+        String result = BLL.AppointmentManager.addAppointment(newAppointment);
+
+        if (result.equals("SUCCESS")) {
+            ReminderDialog dialog = new ReminderDialog(AddAppointmentWindow.this, true, newAppointment);
+            dialog.setVisible(true);
+            this.dispose();
+        } else {
+            JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

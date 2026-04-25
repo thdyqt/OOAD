@@ -6,6 +6,7 @@ package DAL;
 
 import DTO.Appointment;
 import java.sql.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -92,6 +93,22 @@ public class AppointmentDAL {
             return false;
         }
     }
+
+    public static boolean addMeetingParticipant(int appointmentId, int userId) {
+        String sql = "INSERT INTO meeting_participants (appointment_id, user_id) VALUES (?, ?, ?)";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)){
+
+            stmt.setInt(1, appointmentId);
+            stmt.setInt(2, userId);
+
+            return stmt.executeUpdate() > 0;
+        } catch (Exception e){
+            return false;
+        }
+    }
+
     public static List<Appointment> getUpcomingAppointments(int userId) {
         List<Appointment> list = new ArrayList<>();
         // Truy vấn nối bảng Appointments và Calendars để lấy lịch của User hiện tại, lọc end_time

@@ -7,7 +7,6 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Register extends JFrame {
-
     private JTextField txtUsername;
     private JTextField txtEmail;
     private JPasswordField txtPassword;

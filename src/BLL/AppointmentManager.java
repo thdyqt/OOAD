@@ -7,6 +7,7 @@ package BLL;
 import DAL.AppointmentDAL;
 import DTO.Appointment;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -52,5 +53,32 @@ public class AppointmentManager {
 
         boolean isSuccess = AppointmentDAL.updateAppointment(apt);
         return isSuccess ? "SUCCESS" : "Lỗi hệ thống: Không thể cập nhật cuộc hẹn.";
+    }
+
+    public static Appointment checkGroupMeeting(int calendarId, String name, LocalDateTime startTime, LocalDateTime endTime){
+        for (Appointment ap : AppointmentDAL.getAppointmentsByCalendarId(calendarId)) {
+            if (ap.getName().equals(name) && ap.getStartTime() == startTime && ap.getEndTime() == endTime && ap.isGroupMeeting()) {
+                return ap;
+            }
+        }
+        return null;
+    }
+
+    public static boolean joinExistingMeeting(int appointmentId, int userId) {
+        return AppointmentDAL.addMeetingParticipant(appointmentId, userId);
+    }
+
+    public static Appointment checkTimeConflict(int calendarId, LocalDateTime startTime, LocalDateTime endTime) {
+        for (Appointment ap : AppointmentDAL.getAppointmentsByCalendarId(calendarId)) {
+            if (startTime.isBefore(ap.getEndTime()) && endTime.isAfter(ap.getStartTime())) {
+                return ap;
+            }
+        }
+        return null;
+    }
+
+    public static boolean replaceAppointment(int appointmentId, Appointment newAppointment) {
+        newAppointment.setAppointmentId(appointmentId);
+        return AppointmentDAL.updateAppointment(newAppointment);
     }
 }
