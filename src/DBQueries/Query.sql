@@ -56,7 +56,7 @@ INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_
 VALUES (1, 'Bảo vệ Đồ án PBL3', 'Phòng E2.204', '2026-06-10 07:00:00', '2026-06-10 10:00:00', FALSE);
 
 INSERT INTO Reminders (appointment_id, reminder_type, target_time, message)
-VALUES (1, '1_HOUR_BEFORE', '2026-05-15 06:30:00', 'Chuẩn bị slide bảo vệ!');
+VALUES (1, '1_HOUR_BEFORE', '2026-06-10 06:00:00', 'Chuẩn bị slide bảo vệ!');
 
 INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting) 
 VALUES (2, 'Họp cố vấn học tập sinh viên', 'Online Teams', '2026-05-10 19:00:00', '2026-05-10 20:00:00', TRUE);
