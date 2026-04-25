@@ -4,13 +4,14 @@ import DTO.User;
 import java.sql.*;
 
 public class UserDAL {
-    public static User checkLogin(String email, String password) {
-        String sql = "SELECT * FROM Users WHERE email = ? AND password = ?";
+    public static User checkLogin(String user, String password) {
+        String sql = "SELECT * FROM users WHERE (username = ? OR email = ?) AND password = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, email);
-            stmt.setString(2, password);
+            stmt.setString(1, user);
+            stmt.setString(2, user);
+            stmt.setString(3, password);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -32,6 +33,17 @@ public class UserDAL {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             return rs.next(); 
+        } catch (SQLException e) {}
+        return false;
+    }
+
+    public static boolean isUserExist(String user) {
+        String sql = "SELECT * FROM Users WHERE username = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, user);
+            ResultSet rs = stmt.executeQuery();
+            return rs.next();
         } catch (SQLException e) {}
         return false;
     }

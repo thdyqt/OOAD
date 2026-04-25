@@ -14,7 +14,6 @@ public class Register extends JFrame {
     private RoundedButton btnRegister;
     private RoundedButton btnBack;
 
-    // Định nghĩa các màu sắc đồng bộ với hệ thống
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);

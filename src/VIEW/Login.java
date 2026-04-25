@@ -8,7 +8,8 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Login extends JFrame {
-    private JTextField txtEmail;
+    private JLabel lblUser, lblPassword;
+    private JTextField txtUser;
     private JPasswordField txtPassword;
     private RoundedButton btnLogin;
     private RoundedButton btnGoToRegister;
@@ -52,18 +53,18 @@ public class Login extends JFrame {
         gbc.insets = new Insets(10, 0, 10, 15);
 
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.3;
-        JLabel lblEmail = new JLabel("Email:");
-        lblEmail.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblEmail.setForeground(COLOR_TEXT_DARK);
-        panelForm.add(lblEmail, gbc);
+        lblUser = new JLabel("Username:");
+        lblUser.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblUser.setForeground(COLOR_TEXT_DARK);
+        panelForm.add(lblUser, gbc);
 
         gbc.gridx = 1; gbc.gridy = 0; gbc.weightx = 0.7;
-        txtEmail = new JTextField();
-        styleTextField(txtEmail);
-        panelForm.add(txtEmail, gbc);
+        txtUser = new JTextField();
+        styleTextField(txtUser);
+        panelForm.add(txtUser, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0.3;
-        JLabel lblPassword = new JLabel("Mật khẩu:");
+        lblPassword = new JLabel("Mật khẩu:");
         lblPassword.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblPassword.setForeground(COLOR_TEXT_DARK);
         panelForm.add(lblPassword, gbc);
@@ -112,21 +113,21 @@ public class Login extends JFrame {
     }
 
     private void handleLogin() {
-        String email = txtEmail.getText().trim();
+        String user = txtUser.getText().trim();
         String password = new String(txtPassword.getPassword());
 
-        if (email.isEmpty() || password.isEmpty()) {
+        if (user.isEmpty() || password.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập đầy đủ Email và Mật khẩu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        User loggedInUser = userBLL.login(email, password);
+        User loggedInUser = UserManager.login(user, password);
 
         if (loggedInUser != null) {
            new CalendarUI(loggedInUser).setVisible(true);
            this.dispose();
         } else {
-            JOptionPane.showMessageDialog(this, "Email hoặc Mật khẩu không chính xác!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Username hoặc Mật khẩu không chính xác!", "Lỗi", JOptionPane.ERROR_MESSAGE);
         }
     }
 
