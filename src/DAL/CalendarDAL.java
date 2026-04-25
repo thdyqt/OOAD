@@ -60,6 +60,19 @@ public class CalendarDAL {
         }
     }
 
+    public static boolean updateCalendarName(int calendarId, String newName) {
+        String sql = "UPDATE Calendars SET name = ? WHERE calendar_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, newName);
+            stmt.setInt(2, calendarId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public static boolean deleteCalendar(int calendarId) {
         String sql = "DELETE FROM Calendars WHERE calendar_id = ?";
         try (Connection conn = DBConnection.getConnection();

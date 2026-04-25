@@ -16,6 +16,13 @@ public class CalendarManager {
         return CalendarDAL.insertCalendar(cal) ? "SUCCESS" : "Lỗi khi tạo lịch mới.";
     }
 
+    public static String updateCalendarName(int calendarId, String newName) {
+        if (newName == null || newName.trim().isEmpty()) {
+            return "Tên lịch không được để trống!";
+        }
+        return DAL.CalendarDAL.updateCalendarName(calendarId, newName) ? "SUCCESS" : "Lỗi khi đổi tên lịch.";
+    }
+
     public static String deleteCalendar(int userId, int calendarId) {
         List<Calendar> userCalendars = CalendarDAL.getCalendarsByUserId(userId);
 

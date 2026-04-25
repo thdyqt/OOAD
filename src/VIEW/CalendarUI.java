@@ -120,20 +120,29 @@ public class CalendarUI extends JFrame {
         btnAddCal.setPreferredSize(new Dimension(45, 42));
         btnAddCal.setBackground(COLOR_PRIMARY);
         btnAddCal.setForeground(Color.WHITE);
-        btnAddCal.setFont(new Font("Segoe UI", Font.BOLD, 26));
+        btnAddCal.setFont(new Font("Segoe UI", Font.BOLD, 22));
         btnAddCal.setFocusPainted(false);
         btnAddCal.setMargin(new Insets(0, 0, 0, 0));
 
-        RoundedButton btnDelCal = new RoundedButton("×", 10, new Color(220, 53, 69), 1);
-        btnDelCal.setPreferredSize(new Dimension(45, 42));
+        RoundedButton btnEditCal = new RoundedButton("Sửa", 10, new Color(255, 193, 7), 1);
+        btnEditCal.setPreferredSize(new Dimension(55, 42));
+        btnEditCal.setBackground(new Color(255, 193, 7));
+        btnEditCal.setForeground(Color.BLACK);
+        btnEditCal.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnEditCal.setFocusPainted(false);
+        btnEditCal.setMargin(new Insets(0, 0, 0, 0));
+
+        RoundedButton btnDelCal = new RoundedButton("Xóa", 10, new Color(220, 53, 69), 1);
+        btnDelCal.setPreferredSize(new Dimension(55, 42));
         btnDelCal.setBackground(new Color(220, 53, 69));
         btnDelCal.setForeground(Color.WHITE);
-        btnDelCal.setFont(new Font("Segoe UI", Font.BOLD, 28));
+        btnDelCal.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnDelCal.setFocusPainted(false);
         btnDelCal.setMargin(new Insets(0, 0, 0, 0));
 
         panelCalendarControls.add(comboCalendars);
         panelCalendarControls.add(btnAddCal);
+        panelCalendarControls.add(btnEditCal);
         panelCalendarControls.add(btnDelCal);
 
         btnAddCal.addActionListener(e -> {
@@ -144,6 +153,21 @@ public class CalendarUI extends JFrame {
                     refreshCalendarList();
                 } else {
                     JOptionPane.showMessageDialog(this, res);
+                }
+            }
+        });
+
+        btnEditCal.addActionListener(e -> {
+            DTO.Calendar selected = (DTO.Calendar) comboCalendars.getSelectedItem();
+            if (selected != null) {
+                String newName = JOptionPane.showInputDialog(this, "Nhập tên mới cho lịch:", selected.getName());
+                if (newName != null && !newName.trim().isEmpty()) {
+                    String res = BLL.CalendarManager.updateCalendarName(selected.getCalendarId(), newName);
+                    if (res.equals("SUCCESS")) {
+                        refreshCalendarList();
+                    } else {
+                        JOptionPane.showMessageDialog(this, res);
+                    }
                 }
             }
         });
@@ -163,7 +187,6 @@ public class CalendarUI extends JFrame {
             }
         });
 
-        // Navigation Controls
         btnPrev = createNavButton("<");
         btnNext = createNavButton(">");
 
