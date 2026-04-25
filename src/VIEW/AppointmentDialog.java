@@ -1,6 +1,5 @@
 package VIEW;
 
-import BLL.AppointmentManager;
 import DTO.Appointment;
 import DTO.User;
 
@@ -11,8 +10,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class AddAppointmentWindow extends JDialog {
-
+public class AppointmentDialog extends JDialog {
     private JTextField txtName;
     private JTextField txtLocation;
     private JSpinner spinStartHour;
@@ -26,19 +24,22 @@ public class AddAppointmentWindow extends JDialog {
     private User currentUser;
     private int currentCalendarId;
     private LocalDate selectedDate;
+    private Appointment appointmentToEdit;
 
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
     private final Color COLOR_BORDER = new Color(210, 215, 220);
 
-    public AddAppointmentWindow(Frame parent, boolean modal, User user, LocalDate date, int calendarId) {
+    public AppointmentDialog(Frame parent, boolean modal, User user, LocalDate date, int calendarId, Appointment aptToEdit) {
         super(parent, modal);
         this.currentUser = user;
-        this.selectedDate = date;
-        this.currentCalendarId = calendarId;
+        this.appointmentToEdit = aptToEdit;
 
-        setTitle("Thêm Cuộc Hẹn");
+        this.selectedDate = aptToEdit != null ? aptToEdit.getStartTime().toLocalDate() : date;
+        this.currentCalendarId = aptToEdit != null ? aptToEdit.getCalendarId() : calendarId;
+
+        setTitle(aptToEdit == null ? "Thêm Cuộc Hẹn" : "Chỉnh Sửa Cuộc Hẹn");
         setSize(480, 550);
         setLocationRelativeTo(parent);
         setResizable(false);
@@ -46,6 +47,10 @@ public class AddAppointmentWindow extends JDialog {
         setLayout(new BorderLayout());
 
         initComponents();
+
+        if (aptToEdit != null) {
+            fillDataForEdit();
+        }
     }
 
     private void initComponents() {
@@ -196,7 +201,19 @@ public class AddAppointmentWindow extends JDialog {
             txt.setBorder(BorderFactory.createEmptyBorder());
         }
     }
-    
+
+    private void fillDataForEdit() {
+        txtName.setText(appointmentToEdit.getName());
+        txtLocation.setText(appointmentToEdit.getLocation());
+        spinStartHour.setValue(appointmentToEdit.getStartTime().getHour());
+        spinStartMinute.setValue(appointmentToEdit.getStartTime().getMinute());
+        spinEndHour.setValue(appointmentToEdit.getEndTime().getHour());
+        spinEndMinute.setValue(appointmentToEdit.getEndTime().getMinute());
+        chkGroup.setSelected(appointmentToEdit.isGroupMeeting());
+
+        btnSave.setText("Cập nhật Cuộc hẹn");
+    }
+
     private void handleSave() {
         String name = txtName.getText().trim();
         String location = txtLocation.getText().trim();
@@ -214,64 +231,97 @@ public class AddAppointmentWindow extends JDialog {
         LocalDateTime startTime = selectedDate.atTime(startH, startM);
         LocalDateTime endTime = selectedDate.atTime(endH, endM);
 
+        if (startTime.isBefore(LocalDateTime.now())) {
+            JOptionPane.showMessageDialog(this, "Không thể thêm cuộc hẹn vào thời gian hoặc ngày đã qua!", "Lỗi thời gian", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         if (!startTime.isBefore(endTime)) {
             JOptionPane.showMessageDialog(this, "Giờ kết thúc phải diễn ra sau giờ bắt đầu!", "Cảnh báo", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
-        Appointment newAppointment = new Appointment();
-        newAppointment.setCalendarId(currentCalendarId);
-        newAppointment.setName(name);
-        newAppointment.setLocation(location);
-        newAppointment.setStartTime(startTime);
-        newAppointment.setEndTime(endTime);
-        newAppointment.setIsGroupMeeting(isGroup);
-
-        Appointment existingGroup = AppointmentManager.checkGroupMeeting(currentCalendarId, name, startTime, endTime);
+        // 1. KIỂM TRA XEM CÓ GROUP MEETING NÀO KHÔNG
+        Appointment existingGroup = BLL.AppointmentManager.checkGroupMeeting(name, startTime, endTime);
         if (existingGroup != null) {
             int choice = JOptionPane.showConfirmDialog(this,
                     "Hệ thống phát hiện một Cuộc họp nhóm đang diễn ra với cùng tên và thời gian.\nBạn có muốn THAM GIA vào cuộc họp này thay vì tạo mới không?",
                     "Xác nhận tham gia nhóm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-            
+
             if (choice == JOptionPane.YES_OPTION) {
                 boolean joined = BLL.AppointmentManager.joinExistingMeeting(existingGroup.getAppointmentId(), currentUser.getUserId());
                 if (joined) {
                     JOptionPane.showMessageDialog(this, "Bạn đã được thêm vào danh sách thành viên của cuộc họp nhóm!");
                     this.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(this, "Lỗi: Không thể tham gia nhóm lúc này.", "Lỗi hệ thống", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Lỗi: Bạn đã ở trong nhóm này rồi.", "Lỗi", JOptionPane.ERROR_MESSAGE);
                 }
-                return; 
+                return;
             }
         }
 
+        // 2. KIỂM TRA TRÙNG LỊCH (GHI ĐÈ)
         Appointment conflictAppt = BLL.AppointmentManager.checkTimeConflict(currentCalendarId, startTime, endTime);
         if (conflictAppt != null) {
             int choice = JOptionPane.showConfirmDialog(this,
                     "Bạn đã có cuộc hẹn: [" + conflictAppt.getName() + "] trong khung giờ này!\n\nBạn muốn GHI ĐÈ (thay thế) cuộc hẹn cũ bằng cuộc hẹn này không?\nChọn 'No' để ở lại và chọn khung giờ khác.",
                     "Trùng Lịch - Cảnh báo", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-            
+
             if (choice == JOptionPane.YES_OPTION) {
-                boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), newAppointment);
+                Appointment tempAppt = new Appointment();
+                tempAppt.setCalendarId(currentCalendarId);
+                tempAppt.setName(name);
+                tempAppt.setLocation(location);
+                tempAppt.setStartTime(startTime);
+                tempAppt.setEndTime(endTime);
+                tempAppt.setIsGroupMeeting(isGroup);
+
+                boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), tempAppt);
                 if (replaced) {
-                    ReminderDialog dialog = new ReminderDialog(AddAppointmentWindow.this, true, newAppointment);
+                    ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, tempAppt, null);
                     dialog.setVisible(true);
                     this.dispose();
                 } else {
                     JOptionPane.showMessageDialog(this, "Lỗi: Không thể ghi đè cuộc hẹn.", "Lỗi hệ thống", JOptionPane.ERROR_MESSAGE);
                 }
             }
-            return; 
+            return;
         }
 
-        String result = BLL.AppointmentManager.addAppointment(newAppointment);
+        // 3. NẾU KHÔNG CÓ GÌ BẤT THƯỜNG -> TẠO MỚI
+        if (appointmentToEdit != null) {
+            appointmentToEdit.setName(name);
+            appointmentToEdit.setLocation(location);
+            appointmentToEdit.setStartTime(startTime);
+            appointmentToEdit.setEndTime(endTime);
+            appointmentToEdit.setIsGroupMeeting(isGroup);
 
-        if (result.equals("SUCCESS")) {
-            ReminderDialog dialog = new ReminderDialog(AddAppointmentWindow.this, true, newAppointment);
-            dialog.setVisible(true);
-            this.dispose();
+            boolean success = BLL.AppointmentManager.replaceAppointment(appointmentToEdit.getAppointmentId(), appointmentToEdit);
+
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Cập nhật cuộc hẹn thành công!");
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, "Lỗi: Không thể cập nhật cuộc hẹn.", "Lỗi hệ thống", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
-            JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+            Appointment newAppointment = new Appointment();
+            newAppointment.setCalendarId(currentCalendarId);
+            newAppointment.setName(name);
+            newAppointment.setLocation(location);
+            newAppointment.setStartTime(startTime);
+            newAppointment.setEndTime(endTime);
+            newAppointment.setIsGroupMeeting(isGroup);
+
+            String result = BLL.AppointmentManager.addAppointment(newAppointment);
+
+            if (result.equals("SUCCESS")) {
+                ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, newAppointment, null);
+                dialog.setVisible(true);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

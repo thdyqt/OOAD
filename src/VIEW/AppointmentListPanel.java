@@ -5,12 +5,15 @@ import DTO.Appointment;
 import DTO.User;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AppointmentListPanel extends JPanel {
+    private final RoundedButton btnEdit;
+    private final RoundedButton btnDelete;
     private JTable table;
     private DefaultTableModel tableModel;
     private User currentUser;
@@ -41,7 +44,20 @@ public class AppointmentListPanel extends JPanel {
         table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
         table.getTableHeader().setBackground(new Color(240, 240, 240));
 
-        // Ẩn cột ID (Vì người dùng không cần xem số ID, nhưng hệ thống cần để xóa/sửa)
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        for (int i = 1; i < table.getColumnCount(); i++) {
+            table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+        }
+
+        table.setGridColor(new Color(230, 230, 230));
+        table.setSelectionBackground(new Color(190, 220, 255));
+        table.setSelectionForeground(new Color(33, 37, 41));
+        table.setShowVerticalLines(false);
+
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
         table.getColumnModel().getColumn(0).setWidth(0);
@@ -49,27 +65,30 @@ public class AppointmentListPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Footer chứa nút chức năng
-        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 10));
+        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         panelFooter.setBackground(Color.WHITE);
 
-        RoundedButton btnRefresh = new RoundedButton("Làm mới", 10, new Color(100, 100, 100), 1);
-        RoundedButton btnEdit = new RoundedButton("Sửa chi tiết", 10, new Color(0, 86, 179), 1);
-        btnEdit.setBackground(new Color(0, 86, 179)); btnEdit.setForeground(Color.WHITE);
-        RoundedButton btnDelete = new RoundedButton("Xóa", 10, new Color(220, 53, 69), 1);
-        btnDelete.setBackground(new Color(220, 53, 69)); btnDelete.setForeground(Color.WHITE);
+        btnEdit = new RoundedButton("Chỉnh Sửa", 15, new Color(0, 86, 179), 1);
+        btnEdit.setBackground(new Color(0, 86, 179)); // THÊM DÒNG NÀY ĐỂ TÔ MÀU NỀN
+        btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnEdit.setForeground(Color.WHITE);
+        btnEdit.setPreferredSize(new Dimension(160, 45));
 
-        panelFooter.add(btnRefresh);
+        btnDelete = new RoundedButton("Xóa Bỏ", 15, new Color(220, 53, 69), 1);
+        btnDelete.setBackground(new Color(220, 53, 69)); // THÊM DÒNG NÀY ĐỂ TÔ MÀU NỀN
+        btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnDelete.setForeground(Color.WHITE);
+        btnDelete.setPreferredSize(new Dimension(160, 45));
+
         panelFooter.add(btnEdit);
         panelFooter.add(btnDelete);
+
         add(panelFooter, BorderLayout.SOUTH);
 
-        // Bắt sự kiện click
-        btnRefresh.addActionListener(e -> loadData());
         btnDelete.addActionListener(e -> handleDelete());
         btnEdit.addActionListener(e -> handleEdit());
 
-        loadData(); // Load dữ liệu lần đầu
+        loadData();
     }
 
     public void loadData() {
@@ -120,9 +139,8 @@ public class AppointmentListPanel extends JPanel {
         }
 
         Appointment selectedApt = currentList.get(selectedRow);
-        // Mở cửa sổ sửa
-        EditAppointmentWindow editForm = new EditAppointmentWindow((Frame) SwingUtilities.getWindowAncestor(this), true, selectedApt);
+        AppointmentDialog editForm = new AppointmentDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentUser, null, 0, selectedApt);
         editForm.setVisible(true);
-        loadData(); // Tải lại bảng sau khi sửa xong
+        loadData();
     }
 }

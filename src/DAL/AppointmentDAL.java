@@ -41,23 +41,61 @@ public class AppointmentDAL {
         } catch (SQLException e) {}
         return list;
     }
-    
-    public static boolean insertAppointment(Appointment apt) {
+
+    public static Appointment findGroupMeeting(String name, LocalDateTime start, LocalDateTime end) {
+        String sql = "SELECT * FROM Appointments WHERE name = ? AND start_time = ? AND end_time = ? AND is_group_meeting = TRUE LIMIT 1";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            stmt.setTimestamp(2, Timestamp.valueOf(start));
+            stmt.setTimestamp(3, Timestamp.valueOf(end));
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Appointment apt = new Appointment();
+                apt.setAppointmentId(rs.getInt("appointment_id"));
+                apt.setCalendarId(rs.getInt("calendar_id"));
+                apt.setName(rs.getString("name"));
+                apt.setLocation(rs.getString("location"));
+                apt.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
+                apt.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
+                apt.setIsGroupMeeting(rs.getBoolean("is_group_meeting"));
+                return apt;
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return null;
+    }
+
+    public static int insertAppointment(Appointment apt) {
         String sql = "INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting) VALUES (?, ?, ?, ?, ?, ?)";
-        
-        try (Connection con = DBConnection.getConnection(); 
-                PreparedStatement stmt = con.prepareStatement(sql)){
-            
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
             stmt.setInt(1, apt.getCalendarId());
             stmt.setString(2, apt.getName());
             stmt.setString(3, apt.getLocation());
             stmt.setTimestamp(4, Timestamp.valueOf(apt.getStartTime()));
             stmt.setTimestamp(5, Timestamp.valueOf(apt.getEndTime()));
             stmt.setBoolean(6, apt.isGroupMeeting());
-            
-            return stmt.executeUpdate() > 0;
+
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        int newId = generatedKeys.getInt(1);
+
+                        apt.setAppointmentId(newId);
+
+                        return newId;
+                    }
+                }
+            }
+            return -1;
         } catch (Exception e){
-            return false;
+            e.printStackTrace();
+            return -1;
         }
     }
     

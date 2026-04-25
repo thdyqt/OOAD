@@ -8,10 +8,7 @@ import DAL.DBConnection;
 import DAL.ReminderDAL;
 import DTO.Reminder;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +18,10 @@ import java.util.List;
  * @author Admin
  */
 public class ReminderManager {
+    public static List<Reminder> getReminder_24H(int userID){
+        return ReminderDAL.getAllReminder_24Hours(userID);
+    }
+
     public static String addReminder(Reminder reminder) {
         if (reminder.getAppointmentId() <= 0) {
             return "Lỗi: Không xác định được Cuộc hẹn để tạo nhắc nhở!";
@@ -43,9 +44,16 @@ public class ReminderManager {
         }
     }
 
-    //for central
-    public static List<Reminder> getReminder_24H(int userID){
-        return ReminderDAL.getAllReminder_24Hours(userID);
+    public static String updateReminder(Reminder reminder) {
+        if (reminder.getTargetTime().isBefore(LocalDateTime.now())) {
+            return "Thời gian nhắc nhở không hợp lệ vì đã trôi qua!";
+        }
+        boolean success = ReminderDAL.updateReminder(reminder);
+        return success ? "SUCCESS" : "Lỗi hệ thống khi cập nhật nhắc nhở.";
+    }
+
+    public static boolean deleteReminder(int reminderId) {
+        return ReminderDAL.deleteReminder(reminderId);
     }
 
 }

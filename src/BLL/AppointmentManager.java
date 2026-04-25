@@ -10,11 +10,20 @@ import DTO.Appointment;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- *
- * @author Admin
- */
 public class AppointmentManager {
+    public static List<Appointment> getUpcomingAppointments(int userId) {
+        return AppointmentDAL.getUpcomingAppointments(userId);
+    }
+
+    public static Appointment getAppointmentById(int appointmentId) {
+        for (Appointment ap : AppointmentDAL.getAppointmentsByCalendarId(appointmentId)) {
+            if (ap.getAppointmentId() == appointmentId) {
+                return ap;
+            }
+        }
+        return null;
+    }
+
     public static String addAppointment(Appointment apt) {
         if (apt.getName() == null || apt.getName().trim().isEmpty()) {
             return "Tên cuộc hẹn không được để trống!";
@@ -22,46 +31,28 @@ public class AppointmentManager {
         if (apt.getLocation() == null || apt.getLocation().trim().isEmpty()) {
             return "Địa điểm không được để trống!";
         }
-
+        if (apt.getStartTime().isBefore(java.time.LocalDateTime.now())) {
+            return "Không thể thêm cuộc hẹn vào thời gian hoặc ngày đã qua!";
+        }
         if (apt.getStartTime().isAfter(apt.getEndTime()) || apt.getStartTime().isEqual(apt.getEndTime())) {
             return "Thời gian kết thúc phải diễn ra sau thời gian bắt đầu!";
         }
 
-        boolean isSuccess = AppointmentDAL.insertAppointment(apt);
+        int isSuccess = AppointmentDAL.insertAppointment(apt);
         
-        if (isSuccess) {
+        if (isSuccess > 0) {
             return "SUCCESS";
         } else {
             return "Lỗi hệ thống: Không thể lưu cuộc hẹn vào cơ sở dữ liệu.";
         }
-    }
-    public static List<Appointment> getUpcomingAppointments(int userId) {
-        return AppointmentDAL.getUpcomingAppointments(userId);
     }
 
     public static boolean deleteAppointment(int appointmentId) {
         return AppointmentDAL.deleteAppointment(appointmentId);
     }
 
-    public static String updateAppointment(Appointment apt) {
-        if (apt.getName() == null || apt.getName().trim().isEmpty()) {
-            return "Tên cuộc hẹn không được để trống!";
-        }
-        if (apt.getStartTime().isAfter(apt.getEndTime()) || apt.getStartTime().isEqual(apt.getEndTime())) {
-            return "Thời gian kết thúc phải diễn ra sau thời gian bắt đầu!";
-        }
-
-        boolean isSuccess = AppointmentDAL.updateAppointment(apt);
-        return isSuccess ? "SUCCESS" : "Lỗi hệ thống: Không thể cập nhật cuộc hẹn.";
-    }
-
-    public static Appointment checkGroupMeeting(int calendarId, String name, LocalDateTime startTime, LocalDateTime endTime){
-        for (Appointment ap : AppointmentDAL.getAppointmentsByCalendarId(calendarId)) {
-            if (ap.getName().equals(name) && ap.getStartTime() == startTime && ap.getEndTime() == endTime && ap.isGroupMeeting()) {
-                return ap;
-            }
-        }
-        return null;
+    public static Appointment checkGroupMeeting(String name, LocalDateTime startTime, LocalDateTime endTime){
+        return AppointmentDAL.findGroupMeeting(name, startTime, endTime);
     }
 
     public static boolean joinExistingMeeting(int appointmentId, int userId) {

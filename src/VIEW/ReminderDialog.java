@@ -17,24 +17,29 @@ public class ReminderDialog extends JDialog {
     private RoundedButton btnSkip;
 
     private Appointment currentApt;
+    private Reminder reminderToEdit;
 
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_BG = Color.WHITE;
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
     private final Color COLOR_BORDER = new Color(210, 215, 220);
 
-    public ReminderDialog(JDialog parent, boolean modal, Appointment apt) {
-        super(parent, modal);
+    public ReminderDialog(Window parent, boolean modal, Appointment apt, Reminder reminderToEdit) {
+        super(parent, modal ? ModalityType.APPLICATION_MODAL : ModalityType.MODELESS);
         this.currentApt = apt;
+        this.reminderToEdit = reminderToEdit;
 
-        setTitle("Thiết lập Nhắc nhở");
+        setTitle(reminderToEdit == null ? "Thiết lập Nhắc nhở" : "Chỉnh sửa Nhắc nhở");
         setSize(450, 420);
         setLocationRelativeTo(parent);
         setResizable(false);
         getContentPane().setBackground(COLOR_BG);
         setLayout(new BorderLayout());
-
         initComponents();
+
+        if (reminderToEdit != null) {
+            fillData();
+        }
     }
 
     private void initComponents() {
@@ -130,6 +135,11 @@ public class ReminderDialog extends JDialog {
         btnSave.addActionListener(e -> handleSaveReminder());
     }
 
+    private void fillData() {
+        txtMessage.setText(reminderToEdit.getMessage());
+        btnSave.setText("Cập nhật");
+    }
+
     private void handleSaveReminder() {
         int selectedIndex = comboTime.getSelectedIndex();
         LocalDateTime targetTime = currentApt.getStartTime();
@@ -156,20 +166,30 @@ public class ReminderDialog extends JDialog {
 
         String msg = txtMessage.getText().trim();
 
-        Reminder reminder = new Reminder();
-        reminder.setAppointmentId(currentApt.getAppointmentId());
-        reminder.setReminderType(type);
-        reminder.setTargetTime(targetTime);
-        reminder.setMessage(msg);
+        if (reminderToEdit != null) {
+            reminderToEdit.setReminderType(type);
+            reminderToEdit.setTargetTime(targetTime);
+            reminderToEdit.setMessage(msg);
 
-        String result = ReminderManager.addReminder(reminder);
-        
-        if (result.equals("SUCCESS")) {
-            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
-            JOptionPane.showMessageDialog(this, "Đã thiết lập nhắc nhở thành công vào lúc:\n" + targetTime.format(dtf));
-            this.dispose(); 
+            String result = ReminderManager.updateReminder(reminderToEdit);
+            if (result.equals("SUCCESS")) {
+                JOptionPane.showMessageDialog(this, "Cập nhật nhắc nhở thành công!");
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, result, "Lỗi", JOptionPane.ERROR_MESSAGE);
+            }
+
         } else {
-            JOptionPane.showMessageDialog(this, result, "Lỗi Nhắc nhở", JOptionPane.ERROR_MESSAGE);
+            Reminder reminder = new Reminder(currentApt.getAppointmentId(), type, targetTime, msg);
+            String result = ReminderManager.addReminder(reminder);
+
+            if (result.equals("SUCCESS")) {
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
+                JOptionPane.showMessageDialog(this, "Đã thiết lập nhắc nhở thành công vào lúc:\n" + targetTime.format(dtf));
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(this, result, "Lỗi Nhắc nhở", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 }

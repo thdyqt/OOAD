@@ -12,9 +12,6 @@ import java.time.YearMonth;
 import java.util.List;
 
 public class CalendarUI extends JFrame {
-
-    private Central centralWindow = null;
-
     private User currentUser;
     private YearMonth currentYearMonth;
     private LocalDate selectedDate;
@@ -38,6 +35,13 @@ public class CalendarUI extends JFrame {
     private final Color COLOR_BG = new Color(248, 250, 252);
     private final Color COLOR_TEXT_DARK = new Color(33, 37, 41);
     private final Color COLOR_BORDER = new Color(226, 232, 240);
+    private RoundedButton btnCalendar;
+    private RoundedButton btnListAppointments;
+    private RoundedButton btnListReminders;
+    private RoundedButton btnPrev;
+    private RoundedButton btnNext;
+    private RoundedButton btnToday;
+    private RoundedButton btnAddAppointment;
 
     public CalendarUI(User user) {
         this.currentUser = user;
@@ -68,12 +72,9 @@ public class CalendarUI extends JFrame {
         lblMenu.setFont(new Font("Segoe UI", Font.BOLD, 15));
         lblMenu.setForeground(Color.GRAY);
 
-        RoundedButton btnCalendar = createSidebarButton("Lịch của tôi", true);
-        RoundedButton btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
-
-        //i suppose this is my part?
-        //purpose: show all reminders whose time remaining before their dates is less than 24 hours
-        RoundedButton btnListReminders = createSidebarButton("Trung tâm thông báo", false);
+        btnCalendar = createSidebarButton("Lịch của tôi", true);
+        btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
+        btnListReminders = createSidebarButton("Trung tâm thông báo", false);
 
         panelSidebar.add(lblMenu);
         panelSidebar.add(btnCalendar);
@@ -104,8 +105,8 @@ public class CalendarUI extends JFrame {
             renderCalendar();
         });
 
-        RoundedButton btnPrev = createNavButton("<");
-        RoundedButton btnNext = createNavButton(">");
+        btnPrev = createNavButton("<");
+        btnNext = createNavButton(">");
 
         String[] months = new String[12];
         for (int i = 0; i < 12; i++) months[i] = "Tháng " + (i + 1);
@@ -122,7 +123,7 @@ public class CalendarUI extends JFrame {
         spinYear.setFont(new Font("Segoe UI", Font.BOLD, 16));
         spinYear.setPreferredSize(new Dimension(90, 40));
 
-        RoundedButton btnToday = new RoundedButton("Hôm nay", 10, COLOR_PRIMARY, 1);
+        btnToday = new RoundedButton("Hôm nay", 10, COLOR_PRIMARY, 1);
         btnToday.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnToday.setBackground(COLOR_PRIMARY);
         btnToday.setForeground(Color.WHITE);
@@ -153,7 +154,7 @@ public class CalendarUI extends JFrame {
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
         panelFooter.setBackground(COLOR_BG);
 
-        RoundedButton btnAddAppointment = new RoundedButton("+ Thêm Cuộc Hẹn", 20, COLOR_PRIMARY, 1);
+        btnAddAppointment = new RoundedButton("+ Thêm Cuộc Hẹn", 20, COLOR_PRIMARY, 1);
         btnAddAppointment.setFont(new Font("Segoe UI", Font.BOLD, 15));
         btnAddAppointment.setBackground(COLOR_PRIMARY);
         btnAddAppointment.setForeground(Color.WHITE);
@@ -167,12 +168,10 @@ public class CalendarUI extends JFrame {
             cardLayout.show(cardPanel, "CALENDAR_VIEW");
             renderCalendar(); // Refresh lại lịch
 
-            // Set nút Lịch thành Active (Đổi nền, chữ, viền)
             btnCalendar.setBackground(COLOR_PRIMARY);
             btnCalendar.setForeground(Color.WHITE);
             btnCalendar.setCustomBorder(COLOR_PRIMARY, 1);
 
-            // Reset nút Danh sách về bình thường
             btnListAppointments.setBackground(Color.WHITE);
             btnListAppointments.setForeground(COLOR_TEXT_DARK);
             btnListAppointments.setCustomBorder(Color.WHITE, 1);
@@ -204,19 +203,15 @@ public class CalendarUI extends JFrame {
         });
 
         //SUNNY'S PART
-        Central centralPanel = new Central(currentUser.getUserId());
+        ReminderListPanel centralPanel = new ReminderListPanel(currentUser.getUserId());
         btnListReminders.addActionListener(e -> {
-            //refresh
             centralPanel.refreshReminders();
-            //change view
             cardLayout.show(cardPanel, "REMINDER_VIEW");
 
-            //set selected buttons as active
             btnListReminders.setBackground(COLOR_PRIMARY);
             btnListReminders.setForeground(Color.WHITE);
             btnListReminders.setCustomBorder(COLOR_PRIMARY, 1);
 
-            //set unactive buttons
             btnCalendar.setBackground(Color.WHITE);
             btnCalendar.setForeground(COLOR_TEXT_DARK);
             btnCalendar.setCustomBorder(Color.WHITE, 1);
@@ -226,22 +221,17 @@ public class CalendarUI extends JFrame {
             btnListAppointments.setCustomBorder(Color.WHITE, 1);
         });
 
-        // --- THAY THẾ BẰNG ĐOẠN SAU ---
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
 
         appointmentListPanel = new AppointmentListPanel(currentUser);
 
-        // Thêm cả panel Lịch và panel Danh sách vào CardLayout
         cardPanel.add(panelMainContent, "CALENDAR_VIEW");
         cardPanel.add(appointmentListPanel, "LIST_VIEW");
         cardPanel.add(centralPanel, "REMINDER_VIEW");
 
-
-        // Đưa cardPanel ra giữa màn hình
         add(cardPanel, BorderLayout.CENTER);
-
 
         btnPrev.addActionListener(e -> { currentYearMonth = currentYearMonth.minusMonths(1); renderCalendar(); });
         btnNext.addActionListener(e -> { currentYearMonth = currentYearMonth.plusMonths(1); renderCalendar(); });
@@ -256,9 +246,7 @@ public class CalendarUI extends JFrame {
         spinYear.addChangeListener(e -> jumpToSelectedDate());
 
         btnAddAppointment.addActionListener(e -> {
-            AddAppointmentWindow addForm = new AddAppointmentWindow(CalendarUI.this, true, currentUser, selectedDate, currentCalendar.getCalendarId());
-            addForm.setVisible(true);
-            renderCalendar();
+            handleAddAppointment();
         });
     }
 
@@ -288,14 +276,12 @@ public class CalendarUI extends JFrame {
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                // Kiểm tra nếu nút đang KHÔNG được chọn (màu nền không phải xanh) thì mới hover màu nhạt
                 if (!btn.getBackground().equals(COLOR_PRIMARY)) {
                     btn.setBackground(COLOR_HOVER);
                 }
             }
             @Override
             public void mouseExited(MouseEvent e) {
-                // Khi chuột rời đi, nếu nút đang KHÔNG được chọn thì trả về màu trắng
                 if (!btn.getBackground().equals(COLOR_PRIMARY)) {
                     btn.setBackground(Color.WHITE);
                 }
@@ -391,5 +377,19 @@ public class CalendarUI extends JFrame {
 
         panelDays.revalidate();
         panelDays.repaint();
+    }
+
+    private void handleAddAppointment() {
+        if (selectedDate.isBefore(LocalDate.now())) {
+            JOptionPane.showMessageDialog(this,
+                    "Không thể thêm cuộc hẹn cho các ngày đã qua trong quá khứ!",
+                    "Thông báo",
+                    JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        AppointmentDialog addForm = new AppointmentDialog(CalendarUI.this, true, currentUser, selectedDate, currentCalendar.getCalendarId(), null);
+        addForm.setVisible(true);
+        renderCalendar();
     }
 }

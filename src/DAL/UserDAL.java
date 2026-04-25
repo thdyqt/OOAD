@@ -33,7 +33,7 @@ public class UserDAL {
             stmt.setString(1, email);
             ResultSet rs = stmt.executeQuery();
             return rs.next(); 
-        } catch (SQLException e) {}
+        } catch (SQLException e) {e.printStackTrace();}
         return false;
     }
 
@@ -44,7 +44,7 @@ public class UserDAL {
             stmt.setString(1, user);
             ResultSet rs = stmt.executeQuery();
             return rs.next();
-        } catch (SQLException e) {}
+        } catch (SQLException e) {e.printStackTrace();}
         return false;
     }
 
@@ -65,7 +65,7 @@ public class UserDAL {
                 }
                 return true;
             }
-        } catch (SQLException e) {}
+        } catch (SQLException e) {e.printStackTrace();}
         return false;
     }
 
@@ -74,6 +74,6 @@ public class UserDAL {
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             stmt.executeUpdate();
-        } catch (SQLException e) {}
+        } catch (SQLException e) {e.printStackTrace();}
     }
 }
