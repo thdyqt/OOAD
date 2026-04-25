@@ -112,11 +112,22 @@ public class ReminderListPanel extends JPanel {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy");
         for (Reminder r : currentList) {
             Appointment currentApt = AppointmentManager.getAppointmentById(r.getAppointmentId());
+
+            String typeStr = r.getReminderType();
+            switch (typeStr) {
+                case "AT_START": typeStr = "Tại lúc bắt đầu"; break;
+                case "10_MIN_BEFORE": typeStr = "Trước 10 phút"; break;
+                case "30_MIN_BEFORE": typeStr = "Trước 30 phút"; break;
+                case "1_HOUR_BEFORE": typeStr = "Trước 1 giờ"; break;
+                case "1_DAY_BEFORE": typeStr = "Trước 1 ngày"; break;
+                default: typeStr = "Không rõ"; break;
+            }
+
             tableModel.addRow(new Object[]{
                     r.getReminderId(),
                     currentApt != null ? currentApt.getName() : "N/A",
                     r.getMessage(),
-                    r.getReminderType(), // Có thể dùng switch-case để đổi text như cũ
+                    typeStr,
                     r.getTargetTime().format(formatter)
             });
         }

@@ -54,8 +54,12 @@ public class AppointmentManager {
         return AppointmentDAL.addMeetingParticipant(appointmentId, userId);
     }
 
-    public static Appointment checkTimeConflict(int calendarId, LocalDateTime startTime, LocalDateTime endTime) {
+    public static Appointment checkTimeConflict(int calendarId, LocalDateTime startTime, LocalDateTime endTime, int currentAppointmentId) {
         for (Appointment ap : AppointmentDAL.getAppointmentsByCalendarId(calendarId)) {
+            if (ap.getAppointmentId() == currentAppointmentId) {
+                continue;
+            }
+
             if (startTime.isBefore(ap.getEndTime()) && endTime.isAfter(ap.getStartTime())) {
                 return ap;
             }

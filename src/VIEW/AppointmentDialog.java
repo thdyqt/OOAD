@@ -261,7 +261,9 @@ public class AppointmentDialog extends JDialog {
         }
 
         // 2. KIỂM TRA TRÙNG LỊCH (GHI ĐÈ)
-        Appointment conflictAppt = BLL.AppointmentManager.checkTimeConflict(currentCalendarId, startTime, endTime);
+        int currentId = (appointmentToEdit != null) ? appointmentToEdit.getAppointmentId() : -1;
+        Appointment conflictAppt = BLL.AppointmentManager.checkTimeConflict(currentCalendarId, startTime, endTime, currentId);
+
         if (conflictAppt != null) {
             int choice = JOptionPane.showConfirmDialog(this,
                     "Bạn đã có cuộc hẹn: [" + conflictAppt.getName() + "] trong khung giờ này!\n\nBạn muốn GHI ĐÈ (thay thế) cuộc hẹn cũ bằng cuộc hẹn này không?\nChọn 'No' để ở lại và chọn khung giờ khác.",

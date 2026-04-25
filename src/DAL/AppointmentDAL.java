@@ -158,7 +158,7 @@ public class AppointmentDAL {
     }
 
     public static boolean addMeetingParticipant(int appointmentId, int userId) {
-        String sql = "INSERT INTO meeting_participants (appointment_id, user_id) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO meeting_participants (appointment_id, user_id) VALUES ( ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)){
