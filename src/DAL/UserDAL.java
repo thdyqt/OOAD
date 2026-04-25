@@ -61,19 +61,11 @@ public class UserDAL {
             if (affectedRows > 0) {
                 ResultSet keys = stmt.getGeneratedKeys();
                 if (keys.next()) {
-                    createDefaultCalendar(conn, keys.getInt(1));
+                    CalendarDAL.createDefaultCalendar(conn, keys.getInt(1));
                 }
                 return true;
             }
         } catch (SQLException e) {e.printStackTrace();}
         return false;
-    }
-
-    private static void createDefaultCalendar(Connection conn, int userId) {
-        String sql = "INSERT INTO Calendars (owner_id) VALUES (?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, userId);
-            stmt.executeUpdate();
-        } catch (SQLException e) {e.printStackTrace();}
     }
 }

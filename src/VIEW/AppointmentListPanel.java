@@ -18,9 +18,11 @@ public class AppointmentListPanel extends JPanel {
     private DefaultTableModel tableModel;
     private User currentUser;
     private List<Appointment> currentList;
+    private int currentCalendarId;
 
-    public AppointmentListPanel(User user) {
+    public AppointmentListPanel(User user, int calendarId) {
         this.currentUser = user;
+        this.currentCalendarId = calendarId;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
@@ -88,21 +90,19 @@ public class AppointmentListPanel extends JPanel {
         btnDelete.addActionListener(e -> handleDelete());
         btnEdit.addActionListener(e -> handleEdit());
 
-        loadData();
+        loadData(calendarId);
     }
 
-    public void loadData() {
-        tableModel.setRowCount(0); // Xóa dữ liệu cũ
-        currentList = AppointmentManager.getUpcomingAppointments(currentUser.getUserId());
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
+    public void loadData(int calendarId) {
+        this.currentCalendarId = calendarId;
+        tableModel.setRowCount(0);
+        currentList = AppointmentManager.getUpcomingAppointmentsByCalendar(calendarId);
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
         for (Appointment apt : currentList) {
             Object[] row = {
-                    apt.getAppointmentId(),
-                    apt.getName(),
-                    apt.getLocation(),
-                    apt.getStartTime().format(formatter),
-                    apt.getEndTime().format(formatter),
+                    apt.getAppointmentId(), apt.getName(), apt.getLocation(),
+                    apt.getStartTime().format(formatter), apt.getEndTime().format(formatter),
                     apt.isGroupMeeting() ? "Họp nhóm" : "Cá nhân"
             };
             tableModel.addRow(row);
@@ -124,7 +124,7 @@ public class AppointmentListPanel extends JPanel {
             boolean success = AppointmentManager.deleteAppointment(aptId);
             if (success) {
                 JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                loadData();
+                loadData(currentCalendarId);
             } else {
                 JOptionPane.showMessageDialog(this, "Có lỗi xảy ra khi xóa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
@@ -141,6 +141,6 @@ public class AppointmentListPanel extends JPanel {
         Appointment selectedApt = currentList.get(selectedRow);
         AppointmentDialog editForm = new AppointmentDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentUser, null, 0, selectedApt);
         editForm.setVisible(true);
-        loadData();
+        loadData(currentCalendarId);
     }
 }

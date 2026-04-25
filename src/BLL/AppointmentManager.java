@@ -11,17 +11,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class AppointmentManager {
-    public static List<Appointment> getUpcomingAppointments(int userId) {
-        return AppointmentDAL.getUpcomingAppointments(userId);
+    public static List<Appointment> getUpcomingAppointmentsByCalendar(int calendarId) {
+        return AppointmentDAL.getUpcomingAppointmentsByCalendar(calendarId);
     }
 
     public static Appointment getAppointmentById(int appointmentId) {
-        for (Appointment ap : AppointmentDAL.getAppointmentsByCalendarId(appointmentId)) {
-            if (ap.getAppointmentId() == appointmentId) {
-                return ap;
-            }
-        }
-        return null;
+        return AppointmentDAL.getAppointmentById(appointmentId);
     }
 
     public static String addAppointment(Appointment apt) {

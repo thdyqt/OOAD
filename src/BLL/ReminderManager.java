@@ -18,8 +18,8 @@ import java.util.List;
  * @author Admin
  */
 public class ReminderManager {
-    public static List<Reminder> getReminder_24H(int userID){
-        return ReminderDAL.getAllReminder_24Hours(userID);
+    public static List<Reminder> getRemindersByCalendar_24H(int calendarId) {
+        return ReminderDAL.getRemindersByCalendar_24H(calendarId);
     }
 
     public static String addReminder(Reminder reminder) {

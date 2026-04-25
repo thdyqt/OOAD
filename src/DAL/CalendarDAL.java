@@ -38,4 +38,38 @@ public class CalendarDAL {
         } catch (SQLException e) {}
         return list;
     }
+
+    public static void createDefaultCalendar(Connection conn, int userId) {
+        String sql = "INSERT INTO Calendars (owner_id) VALUES (?)";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {e.printStackTrace();}
+    }
+
+    public static boolean insertCalendar(Calendar cal) {
+        String sql = "INSERT INTO Calendars (owner_id, name) VALUES (?, ?)";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, cal.getOwnerId());
+            stmt.setString(2, cal.getName());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public static boolean deleteCalendar(int calendarId) {
+        String sql = "DELETE FROM Calendars WHERE calendar_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, calendarId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

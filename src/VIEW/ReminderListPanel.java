@@ -2,6 +2,7 @@ package VIEW;
 
 import BLL.AppointmentManager;
 import BLL.ReminderManager;
+import DTO.Appointment;
 import DTO.Reminder;
 
 import javax.swing.*;
@@ -15,15 +16,17 @@ public class ReminderListPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
     private List<Reminder> currentList;
+    private int currentCalendarId;
     private int current_UserID;
 
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
-    private final Color COLOR_BORDER = new Color(226, 232, 240);
+    private final Color COLOR_DANGER = new Color(220, 53, 69);
 
-    public ReminderListPanel(int userId) {
+    public ReminderListPanel(int userId, int calendarId) {
         this.current_UserID = userId;
+        this.currentCalendarId = calendarId;
         initComponents();
-        refreshReminders();
+        refreshReminders(currentCalendarId);
     }
 
     private void initComponents() {
@@ -31,15 +34,15 @@ public class ReminderListPanel extends JPanel {
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
 
-        // Tiêu đề
+        // 1. Tiêu đề
         JLabel lblTitle = new JLabel("Trung tâm Thông báo (24h tới)", SwingConstants.LEFT);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 22));
         lblTitle.setForeground(COLOR_PRIMARY);
         lblTitle.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         add(lblTitle, BorderLayout.NORTH);
 
-        // Cấu hình bảng
-        String[] columns = {"ID", "Nội dung", "Thời điểm báo", "Loại", "Cuộc hẹn"};
+        // 2. Cấu hình Bảng (Table)
+        String[] columns = {"ID", "Tên cuộc hẹn", "Nội dung Reminder", "Loại thông báo", "Thời điểm báo"};
         tableModel = new DefaultTableModel(columns, 0) {
             @Override
             public boolean isCellEditable(int row, int column) { return false; }
@@ -47,30 +50,48 @@ public class ReminderListPanel extends JPanel {
         table = new JTable(tableModel);
         table.setRowHeight(35);
         table.setFont(new Font("Segoe UI", Font.PLAIN, 15));
+        table.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
+        table.getTableHeader().setBackground(new Color(240, 240, 240));
 
-        // Căn giữa Header và Cells
+        // Căn giữa Header
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+
+        // Căn giữa nội dung các ô
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        table.getTableHeader().setDefaultRenderer(centerRenderer);
-        for (int i = 0; i < table.getColumnCount(); i++) {
+        for (int i = 1; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
+
+        // Kiểu dáng bảng hiện đại
+        table.setGridColor(new Color(230, 230, 230));
+        table.setSelectionBackground(new Color(190, 220, 255));
+        table.setSelectionForeground(new Color(33, 37, 41));
+        table.setShowVerticalLines(false);
 
         // Ẩn cột ID
         table.getColumnModel().getColumn(0).setMinWidth(0);
         table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
 
-        // Footer với các nút to, đẹp và căn giữa
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(226, 232, 240)));
+        add(scrollPane, BorderLayout.CENTER);
+
+        // 3. Footer với các nút căn giữa (Giống AppointmentListPanel)
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         panelFooter.setBackground(Color.WHITE);
 
-        RoundedButton btnEdit = new RoundedButton("✎ Chỉnh Sửa", 15, new Color(0, 86, 179), 1);
-        btnEdit.setBackground(new Color(0, 86, 179));
+        RoundedButton btnEdit = new RoundedButton("Chỉnh Sửa", 15, COLOR_PRIMARY, 1);
+        btnEdit.setBackground(COLOR_PRIMARY);
+        btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnEdit.setForeground(Color.WHITE);
         btnEdit.setPreferredSize(new Dimension(160, 45));
 
-        RoundedButton btnDelete = new RoundedButton("✖ Xóa Bỏ", 15, new Color(220, 53, 69), 1);
-        btnDelete.setBackground(new Color(220, 53, 69));
+        RoundedButton btnDelete = new RoundedButton("Xóa Bỏ", 15, COLOR_DANGER, 1);
+        btnDelete.setBackground(COLOR_DANGER);
+        btnDelete.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btnDelete.setForeground(Color.WHITE);
         btnDelete.setPreferredSize(new Dimension(160, 45));
 
@@ -78,36 +99,24 @@ public class ReminderListPanel extends JPanel {
         panelFooter.add(btnDelete);
         add(panelFooter, BorderLayout.SOUTH);
 
+        // Sự kiện nút bấm
         btnEdit.addActionListener(e -> handleEdit());
         btnDelete.addActionListener(e -> handleDelete());
-
-        JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBorder(BorderFactory.createLineBorder(COLOR_BORDER));
-        scrollPane.getViewport().setBackground(Color.WHITE);
-        add(scrollPane, BorderLayout.CENTER);
     }
 
-    public void refreshReminders() {
+    public void refreshReminders(int calendarId) {
+        this.currentCalendarId = calendarId;
         tableModel.setRowCount(0);
+        currentList = ReminderManager.getRemindersByCalendar_24H(calendarId);
 
-        List<Reminder> list = ReminderManager.getReminder_24H(this.current_UserID);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy");
-
-        for (Reminder r : list) {
-            String typeStr = r.getReminderType();
-            switch (typeStr) {
-                case "AT_START": typeStr = "Tại lúc bắt đầu"; break;
-                case "10_MIN_BEFORE": typeStr = "Trước 10 phút"; break;
-                case "30_MIN_BEFORE": typeStr = "Trước 30 phút"; break;
-                case "1_HOUR_BEFORE": typeStr = "Trước 1 giờ"; break;
-                case "1_DAY_BEFORE": typeStr = "Trước 1 ngày"; break;
-                default: break;
-            }
-
+        for (Reminder r : currentList) {
+            Appointment currentApt = AppointmentManager.getAppointmentById(r.getAppointmentId());
             tableModel.addRow(new Object[]{
-                    r.getAppointmentId(),
-                    typeStr,
+                    r.getReminderId(),
+                    currentApt != null ? currentApt.getName() : "N/A",
                     r.getMessage(),
+                    r.getReminderType(), // Có thể dùng switch-case để đổi text như cũ
                     r.getTargetTime().format(formatter)
             });
         }
@@ -121,27 +130,35 @@ public class ReminderListPanel extends JPanel {
         }
 
         Reminder selectedReminder = currentList.get(row);
-        DTO.Appointment currentApt = AppointmentManager.getAppointmentById(selectedReminder.getAppointmentId());
+        Appointment currentApt = AppointmentManager.getAppointmentById(selectedReminder.getAppointmentId());
+
         if (currentApt == null) {
-            JOptionPane.showMessageDialog(this, "Lỗi: Không tìm thấy Cuộc hẹn liên kết với thông báo này!", "Lỗi dữ liệu", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Không tìm thấy cuộc hẹn liên quan!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        ReminderDialog dialog = new ReminderDialog(SwingUtilities.getWindowAncestor(this), true, currentApt, selectedReminder);
+        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentApt, selectedReminder);
         dialog.setVisible(true);
-
-        refreshReminders();
+        refreshReminders(currentCalendarId);
     }
 
     private void handleDelete() {
         int row = table.getSelectedRow();
-        if (row == -1) return;
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một thông báo để xóa!", "Nhắc nhở", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
 
         int reminderId = (int) tableModel.getValueAt(row, 0);
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa thông báo này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
+
         if (confirm == JOptionPane.YES_OPTION) {
-            if (ReminderManager.deleteReminder(reminderId)) {
-                refreshReminders();
+            boolean success = ReminderManager.deleteReminder(reminderId);
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Đã xóa nhắc nhở thành công!");
+                refreshReminders(currentCalendarId);
+            } else {
+                JOptionPane.showMessageDialog(this, "Lỗi hệ thống khi xóa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

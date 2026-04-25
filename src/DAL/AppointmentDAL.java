@@ -42,6 +42,31 @@ public class AppointmentDAL {
         return list;
     }
 
+    public static Appointment getAppointmentById(int appointmentId) {
+        String sql = "SELECT * FROM Appointments WHERE appointment_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, appointmentId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Appointment apt = new Appointment();
+                    apt.setAppointmentId(rs.getInt("appointment_id"));
+                    apt.setCalendarId(rs.getInt("calendar_id"));
+                    apt.setName(rs.getString("name"));
+                    apt.setLocation(rs.getString("location"));
+                    apt.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
+                    apt.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
+                    apt.setIsGroupMeeting(rs.getBoolean("is_group_meeting"));
+                    return apt;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static Appointment findGroupMeeting(String name, LocalDateTime start, LocalDateTime end) {
         String sql = "SELECT * FROM Appointments WHERE name = ? AND start_time = ? AND end_time = ? AND is_group_meeting = TRUE LIMIT 1";
         try (Connection conn = DBConnection.getConnection();
@@ -147,18 +172,14 @@ public class AppointmentDAL {
         }
     }
 
-    public static List<Appointment> getUpcomingAppointments(int userId) {
+    public static List<Appointment> getUpcomingAppointmentsByCalendar(int calendarId) {
         List<Appointment> list = new ArrayList<>();
-        // Truy vấn nối bảng Appointments và Calendars để lấy lịch của User hiện tại, lọc end_time
-        String sql = "SELECT a.* FROM Appointments a " +
-                "JOIN Calendars c ON a.calendar_id = c.calendar_id " +
-                "WHERE c.owner_id = ? AND a.end_time >= NOW() " +
-                "ORDER BY a.start_time ASC";
+        String sql = "SELECT * FROM Appointments WHERE calendar_id = ? AND end_time >= NOW() ORDER BY start_time ASC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, userId);
+            stmt.setInt(1, calendarId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Appointment apt = new Appointment();
