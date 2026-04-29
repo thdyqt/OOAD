@@ -43,6 +43,7 @@ public class CalendarUI extends JFrame {
     private RoundedButton btnNext;
     private RoundedButton btnToday;
     private RoundedButton btnAddAppointment;
+    private RoundedButton btnLogout;
 
     public CalendarUI(User user) {
         this.currentUser = user;
@@ -77,11 +78,15 @@ public class CalendarUI extends JFrame {
         btnCalendar = createSidebarButton("Lịch của tôi", true);
         btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
         btnListReminders = createSidebarButton("Trung tâm thông báo", false);
+        btnLogout = createSidebarButton("Đăng xuất", false);
+        btnLogout.setForeground(new Color(220, 53, 69));
 
         panelSidebar.add(lblMenu);
         panelSidebar.add(btnCalendar);
         panelSidebar.add(btnListAppointments);
         panelSidebar.add(btnListReminders);
+        panelSidebar.add(Box.createVerticalStrut(20));
+        panelSidebar.add(btnLogout);
 
         add(panelSidebar, BorderLayout.WEST);
 
@@ -89,7 +94,6 @@ public class CalendarUI extends JFrame {
         JPanel panelHeader = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 15));
         panelHeader.setBackground(COLOR_BG);
 
-        // Calendar Select Controls
         JPanel panelCalendarControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         panelCalendarControls.setBackground(COLOR_BG);
 
@@ -205,12 +209,6 @@ public class CalendarUI extends JFrame {
         spinYear.setFont(new Font("Segoe UI", Font.BOLD, 16));
         spinYear.setPreferredSize(new Dimension(90, 40));
 
-        btnToday = new RoundedButton("Hôm nay", 10, COLOR_PRIMARY, 1);
-        btnToday.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnToday.setBackground(COLOR_PRIMARY);
-        btnToday.setForeground(Color.WHITE);
-        btnToday.setPreferredSize(new Dimension(100, 40));
-
         panelHeader.add(panelCalendarControls);
         panelHeader.add(Box.createHorizontalStrut(10));
         panelHeader.add(btnPrev);
@@ -218,7 +216,6 @@ public class CalendarUI extends JFrame {
         panelHeader.add(spinYear);
         panelHeader.add(btnNext);
         panelHeader.add(Box.createHorizontalStrut(20));
-        panelHeader.add(btnToday);
 
         // --- MAIN CONTENT AREA ---
         JPanel panelMainContent = new JPanel(new BorderLayout());
@@ -234,8 +231,14 @@ public class CalendarUI extends JFrame {
 
         panelMainContent.add(panelCenter, BorderLayout.CENTER);
 
-        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
+        JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 20));
         panelFooter.setBackground(COLOR_BG);
+
+        btnToday = new RoundedButton("Hôm nay", 20, COLOR_PRIMARY, 1);
+        btnToday.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btnToday.setBackground(Color.WHITE);
+        btnToday.setForeground(COLOR_PRIMARY);
+        btnToday.setPreferredSize(new Dimension(100, 45));
 
         btnAddAppointment = new RoundedButton("+ Thêm Cuộc Hẹn", 20, COLOR_PRIMARY, 1);
         btnAddAppointment.setFont(new Font("Segoe UI", Font.BOLD, 15));
@@ -244,6 +247,7 @@ public class CalendarUI extends JFrame {
         btnAddAppointment.setPreferredSize(new Dimension(200, 45));
 
         panelFooter.add(btnAddAppointment);
+        panelFooter.add(btnToday);
         panelMainContent.add(panelFooter, BorderLayout.SOUTH);
 
         // --- CARD LAYOUT CONFIG ---
@@ -281,6 +285,8 @@ public class CalendarUI extends JFrame {
             cardLayout.show(cardPanel, "REMINDER_VIEW");
             updateSidebarActive(btnListReminders);
         });
+
+        btnLogout.addActionListener(e -> logout() );
 
         btnPrev.addActionListener(e -> { currentYearMonth = currentYearMonth.minusMonths(1); renderCalendar(); });
         btnNext.addActionListener(e -> { currentYearMonth = currentYearMonth.plusMonths(1); renderCalendar(); });
@@ -433,6 +439,19 @@ public class CalendarUI extends JFrame {
 
         panelDays.revalidate();
         panelDays.repaint();
+    }
+
+    private void logout() {
+        int confirm = JOptionPane.showConfirmDialog(this,
+                "Bạn có chắc chắn muốn đăng xuất không?",
+                "Xác nhận", JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            this.dispose();
+            currentUser = null;
+            currentCalendar = null;
+            new Login().setVisible(true);
+        }
     }
 
     private void handleAddAppointment() {
