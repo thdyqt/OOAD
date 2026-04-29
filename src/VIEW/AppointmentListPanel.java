@@ -14,6 +14,7 @@ import java.util.List;
 public class AppointmentListPanel extends JPanel {
     private final RoundedButton btnEdit;
     private final RoundedButton btnDelete;
+    private final RoundedButton btnAddReminder;
     private JTable table;
     private DefaultTableModel tableModel;
     private User currentUser;
@@ -70,6 +71,12 @@ public class AppointmentListPanel extends JPanel {
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         panelFooter.setBackground(Color.WHITE);
 
+        btnAddReminder = new RoundedButton("+ Thêm Nhắc Nhở", 15, new Color(40, 167, 69), 1);
+        btnAddReminder.setBackground(new Color(40, 167, 69));
+        btnAddReminder.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        btnAddReminder.setForeground(Color.WHITE);
+        btnAddReminder.setPreferredSize(new Dimension(180, 45));
+
         btnEdit = new RoundedButton("Chỉnh Sửa", 15, new Color(0, 86, 179), 1);
         btnEdit.setBackground(new Color(0, 86, 179)); // THÊM DÒNG NÀY ĐỂ TÔ MÀU NỀN
         btnEdit.setFont(new Font("Segoe UI", Font.BOLD, 16));
@@ -82,11 +89,13 @@ public class AppointmentListPanel extends JPanel {
         btnDelete.setForeground(Color.WHITE);
         btnDelete.setPreferredSize(new Dimension(160, 45));
 
+        panelFooter.add(btnAddReminder);
         panelFooter.add(btnEdit);
         panelFooter.add(btnDelete);
 
         add(panelFooter, BorderLayout.SOUTH);
 
+        btnAddReminder.addActionListener(e -> handleAddReminder());
         btnDelete.addActionListener(e -> handleDelete());
         btnEdit.addActionListener(e -> handleEdit());
 
@@ -107,6 +116,19 @@ public class AppointmentListPanel extends JPanel {
             };
             tableModel.addRow(row);
         }
+    }
+
+    private void handleAddReminder() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một cuộc hẹn để thêm nhắc nhở!", "Nhắc nhở", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Appointment selectedApt = currentList.get(selectedRow);
+        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, selectedApt, null);
+        dialog.setVisible(true);
+        loadData(currentCalendarId);
     }
 
     private void handleDelete() {

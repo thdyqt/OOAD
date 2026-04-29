@@ -77,4 +77,19 @@ public class ReminderDAL {
             return false;
         }
     }
+
+    public static boolean deleteRemindersByAppointmentId(int appointmentId) {
+        String sql = "DELETE FROM Reminders WHERE appointment_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, appointmentId);
+            stmt.executeUpdate();
+            return true;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

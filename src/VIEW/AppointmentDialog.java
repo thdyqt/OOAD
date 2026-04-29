@@ -1,5 +1,6 @@
 package VIEW;
 
+import BLL.ReminderManager;
 import DTO.Appointment;
 import DTO.User;
 
@@ -280,6 +281,7 @@ public class AppointmentDialog extends JDialog {
 
                 boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), tempAppt);
                 if (replaced) {
+                    ReminderManager.deleteRemindersByAppointmentId(conflictAppt.getAppointmentId());
                     ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, tempAppt, null);
                     dialog.setVisible(true);
                     this.dispose();
