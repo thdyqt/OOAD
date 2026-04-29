@@ -77,7 +77,7 @@ public class CalendarUI extends JFrame {
 
         btnCalendar = createSidebarButton("Lịch của tôi", true);
         btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
-        btnListReminders = createSidebarButton("Trung tâm thông báo", false);
+        btnListReminders = createSidebarButton("Trung tâm Thông báo", false);
         btnLogout = createSidebarButton("Đăng xuất", false);
         btnLogout.setForeground(new Color(220, 53, 69));
 

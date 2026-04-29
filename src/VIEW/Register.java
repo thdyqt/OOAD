@@ -54,9 +54,9 @@ public class Register extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(10, 0, 10, 15);
 
-        // Họ tên
+        // Username
         gbc.gridx = 0; gbc.gridy = 0; gbc.weightx = 0.35;
-        JLabel lblName = new JLabel("Họ tên:");
+        JLabel lblName = new JLabel("Username:");
         lblName.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblName.setForeground(COLOR_TEXT_DARK);
         panelForm.add(lblName, gbc);
