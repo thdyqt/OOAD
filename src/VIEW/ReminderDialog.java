@@ -17,6 +17,7 @@ public class ReminderDialog extends JDialog {
     private RoundedButton btnSkip;
 
     private Appointment currentApt;
+    private int currentUserId;
     private Reminder reminderToEdit;
 
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
@@ -24,9 +25,10 @@ public class ReminderDialog extends JDialog {
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
     private final Color COLOR_BORDER = new Color(210, 215, 220);
 
-    public ReminderDialog(Window parent, boolean modal, Appointment apt, Reminder reminderToEdit) {
+    public ReminderDialog(Window parent, boolean modal, Appointment apt, Reminder reminderToEdit, int currentUserId) {
         super(parent, modal ? ModalityType.APPLICATION_MODAL : ModalityType.MODELESS);
         this.currentApt = apt;
+        this.currentUserId = currentUserId;
         this.reminderToEdit = reminderToEdit;
 
         setTitle(reminderToEdit == null ? "Thiết lập Nhắc nhở" : "Chỉnh sửa Nhắc nhở");
@@ -180,7 +182,7 @@ public class ReminderDialog extends JDialog {
             }
 
         } else {
-            Reminder reminder = new Reminder(currentApt.getAppointmentId(), type, targetTime, msg);
+            Reminder reminder = new Reminder(currentApt.getAppointmentId(), currentUserId, type, targetTime, msg);
             String result = ReminderManager.addReminder(reminder);
 
             if (result.equals("SUCCESS")) {

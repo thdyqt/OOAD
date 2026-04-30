@@ -48,6 +48,10 @@ public class AppointmentManager {
         return AppointmentDAL.deleteAppointment(appointmentId);
     }
 
+    public static boolean leaveMeeting(int appointmentId, int userId) {
+        return DAL.AppointmentDAL.removeMeetingParticipant(appointmentId, userId);
+    }
+
     public static Appointment checkGroupMeeting(String name, LocalDateTime startTime, LocalDateTime endTime){
         return AppointmentDAL.findGroupMeeting(name, startTime, endTime);
     }

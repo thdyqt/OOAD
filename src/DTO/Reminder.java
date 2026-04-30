@@ -13,22 +13,25 @@ import java.time.LocalDateTime;
 public class Reminder {
     private int reminderId;
     private int appointmentId;
+    private int userId;
     private String reminderType;
     private LocalDateTime targetTime;
     private String message; 
    
     public Reminder() {}
     
-    public Reminder(int appointmentId, String reminderType, LocalDateTime targetTime, String message) {
+    public Reminder(int appointmentId, int userId, String reminderType, LocalDateTime targetTime, String message) {
         this.appointmentId = appointmentId;
+        this.userId = userId;
         this.reminderType = reminderType;
         this.targetTime = targetTime;
         this.message = message;
     }
     
-    public Reminder(int reminderId, int appointmentId, String reminderType, LocalDateTime targetTime, String message) {
+    public Reminder(int reminderId, int userId, int appointmentId, String reminderType, LocalDateTime targetTime, String message) {
         this.reminderId = reminderId;
         this.appointmentId = appointmentId;
+        this.userId = userId;
         this.reminderType = reminderType;
         this.targetTime = targetTime;
         this.message = message;
@@ -48,6 +51,14 @@ public class Reminder {
 
     public void setAppointmentId(int appointmentId) {
         this.appointmentId = appointmentId;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getReminderType() {

@@ -1,5 +1,6 @@
 package VIEW;
 
+import BLL.AppointmentManager;
 import BLL.ReminderManager;
 import DTO.Appointment;
 import DTO.User;
@@ -281,8 +282,8 @@ public class AppointmentDialog extends JDialog {
 
                 boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), tempAppt);
                 if (replaced) {
-                    ReminderManager.deleteRemindersByAppointmentId(conflictAppt.getAppointmentId());
-                    ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, tempAppt, null);
+                    ReminderManager.deleteRemindersByAppointmentId(conflictAppt.getAppointmentId(), currentUser.getUserId());
+                    ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, tempAppt, null, currentUser.getUserId());
                     dialog.setVisible(true);
                     this.dispose();
                 } else {
@@ -320,7 +321,11 @@ public class AppointmentDialog extends JDialog {
             String result = BLL.AppointmentManager.addAppointment(newAppointment);
 
             if (result.equals("SUCCESS")) {
-                ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, newAppointment, null);
+                if (isGroup) {
+                    AppointmentManager.joinExistingMeeting(newAppointment.getAppointmentId(), currentUser.getUserId());
+                }
+
+                ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, newAppointment, null, currentUser.getUserId());
                 dialog.setVisible(true);
                 this.dispose();
             } else {

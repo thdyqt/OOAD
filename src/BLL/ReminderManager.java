@@ -52,11 +52,11 @@ public class ReminderManager {
         return success ? "SUCCESS" : "Lỗi hệ thống khi cập nhật nhắc nhở.";
     }
 
-    public static boolean deleteReminder(int reminderId) {
-        return ReminderDAL.deleteReminder(reminderId);
+    public static boolean deleteReminder(int reminderId, int userId) {
+        return DAL.ReminderDAL.deleteReminder(reminderId, userId);
     }
 
-    public static boolean deleteRemindersByAppointmentId(int appointmentId) {
-        return DAL.ReminderDAL.deleteRemindersByAppointmentId(appointmentId);
+    public static boolean deleteRemindersByAppointmentId(int appointmentId, int userId) {
+        return DAL.ReminderDAL.deleteRemindersByAppointmentId(appointmentId, userId);
     }
 }

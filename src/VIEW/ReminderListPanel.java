@@ -148,7 +148,7 @@ public class ReminderListPanel extends JPanel {
             return;
         }
 
-        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentApt, selectedReminder);
+        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentApt, selectedReminder, current_UserID);
         dialog.setVisible(true);
         refreshReminders(currentCalendarId);
     }
@@ -164,7 +164,7 @@ public class ReminderListPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa thông báo này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            boolean success = ReminderManager.deleteReminder(reminderId);
+            boolean success = ReminderManager.deleteReminder(reminderId, current_UserID);
             if (success) {
                 JOptionPane.showMessageDialog(this, "Đã xóa nhắc nhở thành công!");
                 refreshReminders(currentCalendarId);

@@ -30,10 +30,12 @@ CREATE TABLE Appointments (
 CREATE TABLE Reminders (
     reminder_id INT AUTO_INCREMENT PRIMARY KEY,
     appointment_id INT NOT NULL,
+    user_id INT NOT NULL,
     reminder_type VARCHAR(50), 
     target_time DATETIME NOT NULL,
     message VARCHAR(255),
-    FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id) ON DELETE CASCADE
+    FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Meeting_Participants (
@@ -55,8 +57,8 @@ INSERT INTO Calendars (owner_id) VALUES
 INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting) 
 VALUES (1, 'Bảo vệ Đồ án PBL3', 'Phòng E2.204', '2026-06-10 07:00:00', '2026-06-10 10:00:00', FALSE);
 
-INSERT INTO Reminders (appointment_id, reminder_type, target_time, message)
-VALUES (1, '1_HOUR_BEFORE', '2026-06-10 06:00:00', 'Chuẩn bị slide bảo vệ!');
+INSERT INTO Reminders (appointment_id, user_id, reminder_type, target_time, message)
+VALUES (1, 1, '1_HOUR_BEFORE', '2026-06-10 06:00:00', 'Chuẩn bị slide bảo vệ!');
 
 INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting) 
 VALUES (2, 'Họp cố vấn học tập sinh viên', 'Online Teams', '2026-05-10 19:00:00', '2026-05-10 20:00:00', TRUE);
