@@ -28,7 +28,7 @@ public class Reminder {
         this.message = message;
     }
     
-    public Reminder(int reminderId, int userId, int appointmentId, String reminderType, LocalDateTime targetTime, String message) {
+    public Reminder(int reminderId, int appointmentId, int userId, String reminderType, LocalDateTime targetTime, String message) {
         this.reminderId = reminderId;
         this.appointmentId = appointmentId;
         this.userId = userId;

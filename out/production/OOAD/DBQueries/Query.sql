@@ -48,8 +48,8 @@ CREATE TABLE Meeting_Participants (
 );
 
 INSERT INTO Users (username, name, password) VALUES 
-('thdyqt', 'Phan Thanh Duy', 123456),
-('giangvien', 'Le Thi My Hanh', 123456);
+('thdyqt', 'Phan Thanh Duy', '123456'),
+('giangvien', 'Le Thi My Hanh', '123456');
 
 INSERT INTO Calendars (owner_id) VALUES 
 (1), (2);
@@ -64,4 +64,4 @@ INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_
 VALUES (2, 'Họp cố vấn học tập sinh viên', 'Online Teams', '2026-05-10 19:00:00', '2026-05-10 20:00:00', TRUE);
 
 INSERT INTO Meeting_Participants (appointment_id, user_id)
-VALUES (2, 1);
+VALUES (2, 1), (2, 2);

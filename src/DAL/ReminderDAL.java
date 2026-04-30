@@ -12,7 +12,7 @@ public class ReminderDAL {
                 "JOIN Appointments a ON r.appointment_id = a.appointment_id " +
                 "LEFT JOIN Meeting_Participants mp ON a.appointment_id = mp.appointment_id " +
                 "WHERE (a.calendar_id = ? OR mp.user_id = ?) AND r.user_id = ? " +
-                "AND r.target_time >= NOW() " +
+                "AND r.target_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY) " +
                 "ORDER BY r.target_time ASC";
 
         try (Connection conn = DBConnection.getConnection();

@@ -213,7 +213,7 @@ public class AppointmentDialog extends JDialog {
         spinEndMinute.setValue(appointmentToEdit.getEndTime().getMinute());
         chkGroup.setSelected(appointmentToEdit.isGroupMeeting());
 
-        btnSave.setText("Cập nhật Cuộc hẹn");
+        btnSave.setText("Cập nhật");
     }
 
     private void handleSave() {
