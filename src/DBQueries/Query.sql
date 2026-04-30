@@ -3,8 +3,8 @@ USE CalendarDB;
 
 CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(100) NOT NULL,
-    email VARCHAR(150) UNIQUE NOT NULL,
+    username VARCHAR(100) UNIQUE NOT NULL,
+    name VARCHAR(150) NOT NULL,
     password VARCHAR(100) NOT NULL
 );
 
@@ -45,9 +45,9 @@ CREATE TABLE Meeting_Participants (
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
-INSERT INTO Users (username, email, password) VALUES 
-('Phan Thanh Duy', '102240130@sv1.dut.udn.vn', 123456),
-('Giang Vien', 'gv@dut.udn.vn', 123456);
+INSERT INTO Users (username, name, password) VALUES 
+('thdyqt', 'Phan Thanh Duy', 123456),
+('giangvien', 'Le Thi My Hanh', 123456);
 
 INSERT INTO Calendars (owner_id) VALUES 
 (1), (2);

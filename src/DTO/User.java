@@ -4,6 +4,8 @@
  */
 package DTO;
 
+import java.time.LocalDateTime;
+
 /**
  *
  * @author Admin
@@ -11,21 +13,22 @@ package DTO;
 public class User {
     private int userId;
     private String username;
-    private String email;
+    private String name;
     private String password;
+    private LocalDateTime joinedAt;
     
     public User() {}
     
-    public User(String username, String email, String password) {
+    public User(String username, String name, String password) {
         this.username = username;
-        this.email = email;
+        this.name = name;
         this.password = password;
     }
         
-    public User(int userId, String username, String email, String password) {
+    public User(int userId, String username, String name, String password) {
         this.userId = userId;
         this.username = username;
-        this.email = email;
+        this.name = name;
         this.password = password;
     }
 
@@ -45,12 +48,12 @@ public class User {
         this.username = username;
     }
 
-    public String getEmail() {
-        return email;
+    public String getName() {
+        return name;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getPassword() {
@@ -59,5 +62,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public LocalDateTime getJoinedAt() {
+        return joinedAt;
+    }
+
+    public void setJoinedAt(LocalDateTime joinedAt) {
+        this.joinedAt = joinedAt;
     }
 }

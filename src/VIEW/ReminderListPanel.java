@@ -107,7 +107,7 @@ public class ReminderListPanel extends JPanel {
     public void refreshReminders(int calendarId) {
         this.currentCalendarId = calendarId;
         tableModel.setRowCount(0);
-        currentList = ReminderManager.getRemindersByCalendar_24H(calendarId);
+        currentList = ReminderManager.getRemindersByCalendar_24H(calendarId, current_UserID);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy");
         for (Reminder r : currentList) {

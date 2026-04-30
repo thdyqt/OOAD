@@ -68,7 +68,7 @@ public class Register extends JFrame {
 
         // Email
         gbc.gridx = 0; gbc.gridy = 1;
-        JLabel lblEmail = new JLabel("Email:");
+        JLabel lblEmail = new JLabel("Họ và Tên:");
         lblEmail.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblEmail.setForeground(COLOR_TEXT_DARK);
         panelForm.add(lblEmail, gbc);

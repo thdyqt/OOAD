@@ -5,6 +5,8 @@
 package DAL;
 
 import DTO.Appointment;
+import DTO.User;
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -172,14 +174,18 @@ public class AppointmentDAL {
         }
     }
 
-    public static List<Appointment> getUpcomingAppointmentsByCalendar(int calendarId) {
+    public static List<Appointment> getUpcomingAppointmentsByCalendar(int calendarId, int userId) {
         List<Appointment> list = new ArrayList<>();
-        String sql = "SELECT * FROM Appointments WHERE calendar_id = ? AND end_time >= NOW() ORDER BY start_time ASC";
+        String sql = "SELECT DISTINCT a.* FROM Appointments a " +
+                "LEFT JOIN Meeting_Participants mp ON a.appointment_id = mp.appointment_id " +
+                "WHERE (a.calendar_id = ? OR mp.user_id = ?) AND a.end_time >= NOW() " +
+                "ORDER BY a.start_time ASC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, calendarId);
+            stmt.setInt(2, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Appointment apt = new Appointment();

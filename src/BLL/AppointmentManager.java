@@ -5,14 +5,16 @@
 package BLL;
 
 import DAL.AppointmentDAL;
+import DAL.UserDAL;
 import DTO.Appointment;
+import DTO.User;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public class AppointmentManager {
-    public static List<Appointment> getUpcomingAppointmentsByCalendar(int calendarId) {
-        return AppointmentDAL.getUpcomingAppointmentsByCalendar(calendarId);
+    public static List<Appointment> getUpcomingAppointmentsByCalendar(int calendarId, int userId) {
+        return AppointmentDAL.getUpcomingAppointmentsByCalendar(calendarId, userId);
     }
 
     public static Appointment getAppointmentById(int appointmentId) {
@@ -70,5 +72,9 @@ public class AppointmentManager {
     public static boolean replaceAppointment(int appointmentId, Appointment newAppointment) {
         newAppointment.setAppointmentId(appointmentId);
         return AppointmentDAL.updateAppointment(newAppointment);
+    }
+
+    public static List<User> getMeetingParticipants(int appointmentId) {
+        return UserDAL.getParticipantsByAppointmentId(appointmentId);
     }
 }

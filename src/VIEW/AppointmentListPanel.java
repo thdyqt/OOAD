@@ -12,6 +12,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class AppointmentListPanel extends JPanel {
+    private RoundedButton btnView;
     private final RoundedButton btnEdit;
     private final RoundedButton btnDelete;
     private final RoundedButton btnAddReminder;
@@ -71,6 +72,12 @@ public class AppointmentListPanel extends JPanel {
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 20));
         panelFooter.setBackground(Color.WHITE);
 
+        btnView = new RoundedButton("Xem Chi Tiết", 15, new Color(23, 162, 184), 1);
+        btnView.setBackground(new Color(23, 162, 184));
+        btnView.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btnView.setForeground(Color.WHITE);
+        btnView.setPreferredSize(new Dimension(130, 45));
+
         btnAddReminder = new RoundedButton("+ Thêm Nhắc Nhở", 15, new Color(40, 167, 69), 1);
         btnAddReminder.setBackground(new Color(40, 167, 69));
         btnAddReminder.setFont(new Font("Segoe UI", Font.BOLD, 15));
@@ -89,12 +96,14 @@ public class AppointmentListPanel extends JPanel {
         btnDelete.setForeground(Color.WHITE);
         btnDelete.setPreferredSize(new Dimension(160, 45));
 
+        panelFooter.add(btnView);
         panelFooter.add(btnAddReminder);
         panelFooter.add(btnEdit);
         panelFooter.add(btnDelete);
 
         add(panelFooter, BorderLayout.SOUTH);
 
+        btnView.addActionListener(e -> handleViewDetails());
         btnAddReminder.addActionListener(e -> handleAddReminder());
         btnDelete.addActionListener(e -> handleDelete());
         btnEdit.addActionListener(e -> handleEdit());
@@ -105,7 +114,7 @@ public class AppointmentListPanel extends JPanel {
     public void loadData(int calendarId) {
         this.currentCalendarId = calendarId;
         tableModel.setRowCount(0);
-        currentList = AppointmentManager.getUpcomingAppointmentsByCalendar(calendarId);
+        currentList = AppointmentManager.getUpcomingAppointmentsByCalendar(calendarId, currentUser.getUserId());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
         for (Appointment apt : currentList) {
@@ -116,6 +125,18 @@ public class AppointmentListPanel extends JPanel {
             };
             tableModel.addRow(row);
         }
+    }
+
+    private void handleViewDetails() {
+        int selectedRow = table.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một cuộc hẹn để xem chi tiết!", "Nhắc nhở", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        Appointment selectedApt = currentList.get(selectedRow);
+        MeetingDetailDialog dialog = new MeetingDetailDialog((Frame) SwingUtilities.getWindowAncestor(this), true, selectedApt);
+        dialog.setVisible(true);
     }
 
     private void handleAddReminder() {

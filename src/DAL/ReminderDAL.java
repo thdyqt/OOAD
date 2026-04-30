@@ -7,17 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ReminderDAL {
-    public static List<Reminder> getRemindersByCalendar_24H(int calendarId) {
+    public static List<Reminder> getRemindersByCalendar_24H(int calendarId, int userId) {
         List<Reminder> list = new ArrayList<>();
-        String sql = "SELECT r.* FROM Reminders r " +
+        String sql = "SELECT DISTINCT r.* FROM Reminders r " +
                 "JOIN Appointments a ON r.appointment_id = a.appointment_id " +
-                "WHERE a.calendar_id = ? " +
+                "LEFT JOIN Meeting_Participants mp ON a.appointment_id = mp.appointment_id " +
+                "WHERE (a.calendar_id = ? OR mp.user_id = ?) " +
                 "AND r.target_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY) " +
                 "ORDER BY r.target_time ASC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, calendarId);
+            stmt.setInt(2, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(new Reminder(
