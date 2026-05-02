@@ -77,8 +77,4 @@ public class AppointmentManager {
         newAppointment.setAppointmentId(appointmentId);
         return AppointmentDAL.updateAppointment(newAppointment);
     }
-
-    public static List<User> getMeetingParticipants(int appointmentId) {
-        return UserDAL.getParticipantsByAppointmentId(appointmentId);
-    }
 }

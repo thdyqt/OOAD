@@ -1,5 +1,6 @@
 package VIEW;
 
+import DTO.Calendar;
 import DTO.User;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -16,7 +17,7 @@ public class CalendarUI extends JFrame {
     private LocalDate selectedDate;
 
     private JComboBox<DTO.Calendar> comboCalendars;
-    private DTO.Calendar currentCalendar;
+    private Calendar currentCalendar;
 
     private JComboBox<String> comboMonth;
     private JSpinner spinYear;

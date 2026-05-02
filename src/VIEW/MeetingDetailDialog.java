@@ -1,6 +1,7 @@
 package VIEW;
 
 import BLL.AppointmentManager;
+import BLL.UserManager;
 import DTO.Appointment;
 import DTO.User;
 
@@ -110,7 +111,7 @@ public class MeetingDetailDialog extends JDialog {
             table.getColumnModel().getColumn(0).setWidth(0);
 
             DateTimeFormatter dtfJoin = DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy");
-            List<User> participants = AppointmentManager.getMeetingParticipants(currentApt.getAppointmentId());
+            List<User> participants = UserManager.getMeetingParticipants(currentApt.getAppointmentId());
             for (User u : participants) {
                 String joinTimeStr = (u.getJoinedAt() != null) ? u.getJoinedAt().format(dtfJoin) : "Không xác định";
                 tableModel.addRow(new Object[]{u.getUserId(), u.getName(), u.getUsername(), joinTimeStr});
