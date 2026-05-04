@@ -5,9 +5,7 @@
 package BLL;
 
 import DAL.AppointmentDAL;
-import DAL.UserDAL;
 import DTO.Appointment;
-import DTO.User;
 
 import java.time.LocalDateTime;
 import java.util.List;

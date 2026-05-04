@@ -3,7 +3,6 @@ package VIEW;
 import BLL.AppointmentManager;
 import BLL.ReminderManager;
 import DTO.Appointment;
-import DTO.User;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

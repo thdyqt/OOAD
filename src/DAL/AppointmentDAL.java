@@ -4,8 +4,8 @@
  */
 package DAL;
 
+import BLL.DBConnection;
 import DTO.Appointment;
-import DTO.User;
 
 import java.sql.*;
 import java.time.LocalDateTime;

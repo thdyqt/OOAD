@@ -2,7 +2,6 @@ package VIEW;
 
 import BLL.AppointmentManager;
 import DTO.Appointment;
-import DTO.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
