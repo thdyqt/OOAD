@@ -9,62 +9,23 @@ package DTO;
  * @author Admin
  */
 public class Calendar {
-    private int calendarId;
-    private int ownerId;
-    private String name;
+    //attributes
     private String timezone;
-    
+
+    //methods
+    //constructors
     public Calendar() {}
 
-    public Calendar(int ownerId, String name, String timezone) {
-        this.ownerId = ownerId;
-        this.name = name;
-        this.timezone = timezone;
-    }
-        
-    public Calendar(int calendarId, int ownerId, String name, String timezone) {
-        this.calendarId = calendarId;
-        this.ownerId = ownerId;
-        this.name = name;
+    public Calendar(String timezone) {
         this.timezone = timezone;
     }
 
-    public int getCalendarId() {
-        return calendarId;
-    }
-
-    public void setCalendarId(int calendarId) {
-        this.calendarId = calendarId;
-    }
-
-    public int getOwnerId() {
-        return ownerId;
-    }
-
-    public void setOwnerId(int ownerId) {
-        this.ownerId = ownerId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    
-
+    //get-set
     public String getTimezone() {
         return timezone;
     }
 
     public void setTimezone(String timezone) {
         this.timezone = timezone;
-    }
-    
-    @Override
-    public String toString() {
-        return this.name;
     }
 }
