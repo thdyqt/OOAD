@@ -10,7 +10,6 @@ import java.time.YearMonth;
 import java.util.List;
 
 public class CalendarUI extends JFrame {
-    private User currentUser;
     private YearMonth currentYearMonth;
     private LocalDate selectedDate;
 
@@ -44,8 +43,7 @@ public class CalendarUI extends JFrame {
     private RoundedButton btnAddAppointment;
     private RoundedButton btnLogout;
 
-    public CalendarUI(User user) {
-        this.currentUser = user;
+    public CalendarUI() {
         this.currentYearMonth = YearMonth.now();
         this.selectedDate = LocalDate.now();
 
@@ -462,5 +460,11 @@ public class CalendarUI extends JFrame {
         AppointmentDialog addForm = new AppointmentDialog(this, true, currentUser, selectedDate, currentCalendar.getCalendarId(), null);
         addForm.setVisible(true);
         renderCalendar();
+    }
+
+    public static void main(String[] args) {
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+        catch (Exception ex) {}
+        SwingUtilities.invokeLater(() -> new CalendarUI().setVisible(true));
     }
 }

@@ -17,12 +17,10 @@ public class AppointmentListPanel extends JPanel {
     private final RoundedButton btnAddReminder;
     private JTable table;
     private DefaultTableModel tableModel;
-    private User currentUser;
     private List<Appointment> currentList;
     private int currentCalendarId;
 
-    public AppointmentListPanel(User user, int calendarId) {
-        this.currentUser = user;
+    public AppointmentListPanel(int calendarId) {
         this.currentCalendarId = calendarId;
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
@@ -113,14 +111,13 @@ public class AppointmentListPanel extends JPanel {
     public void loadData(int calendarId) {
         this.currentCalendarId = calendarId;
         tableModel.setRowCount(0);
-        currentList = AppointmentManager.getUpcomingAppointmentsByCalendar(calendarId, currentUser.getUserId());
+        currentList = AppointmentManager.getUpcomingAppointmentsByCalendar();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
         for (Appointment apt : currentList) {
             Object[] row = {
-                    apt.getAppointmentId(), apt.getName(), apt.getLocation(),
+                    apt.getAppointmentId(), apt.getName(),
                     apt.getStartTime().format(formatter), apt.getEndTime().format(formatter),
-                    apt.isGroupMeeting() ? "Họp nhóm" : "Cá nhân"
             };
             tableModel.addRow(row);
         }
