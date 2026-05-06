@@ -53,7 +53,7 @@ public class ReminderManager {
     }
 
     public static boolean deleteReminder(int reminderId, int userId) {
-        return DAL.ReminderDAL.deleteReminder(reminderId, userId);
+        return DAL.ReminderDAL.deleteReminder(reminderId);
     }
 
     public static boolean deleteRemindersByAppointmentId(int appointmentId, int userId) {

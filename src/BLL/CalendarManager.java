@@ -24,7 +24,7 @@ public class CalendarManager {
     }
 
     public static String deleteCalendar(int userId, int calendarId) {
-        List<Calendar> userCalendars = CalendarDAL.getCalendarsByUserId(userId);
+        List<Calendar> userCalendars = CalendarDAL.getCalendarsByUserId();
 
         if (userCalendars.size() <= 1) {
             return "Bạn không thể xóa tờ lịch cuối cùng!";
