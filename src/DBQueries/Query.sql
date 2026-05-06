@@ -1,10 +1,6 @@
 CREATE DATABASE IF NOT EXISTS Scheduler;
 USE Scheduler;
 
-CREATE TABLE Calendars (
-    time_zone VARCHAR(50) DEFAULT 'Asia/Ho_Chi_Minh',
-);
-
 CREATE TABLE Appointments (
     appointment_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(200) NOT NULL,

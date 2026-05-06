@@ -17,15 +17,14 @@ import java.util.List;
  * @author Admin
  */
 public class AppointmentDAL {
-    public static List<Appointment> getAppointmentsByCalendarId(int calendarId) {
+    public static List<Appointment> getAppointments() {
         List<Appointment> list = new ArrayList<>();
-        String sql = "SELECT * FROM Appointments WHERE calendar_id = ?";
+        String sql = "SELECT * FROM Appointments";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setInt(1, calendarId);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Appointment apt = new Appointment();
