@@ -21,11 +21,11 @@ CREATE TABLE Reminders (
     FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id) ON DELETE CASCADE,
 );
 
-INSERT INTO Appointments (calendar_id, name, start_time, end_time)
-VALUES (1, 'Bảo vệ Đồ án PBL3',  '2026-06-10 07:00:00', '2026-06-10 10:00:00');
+INSERT INTO Appointments (name, start_time, end_time)
+VALUES ('Bảo vệ Đồ án PBL3',  '2026-06-10 07:00:00', '2026-06-10 10:00:00');
 
-INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting)
-VALUES (2, 'Họp cố vấn học tập sinh viên', 'Online Teams', '2026-05-10 19:00:00', '2026-05-10 20:00:00', TRUE);
+INSERT INTO Appointments (name, location, start_time, end_time, is_group_meeting)
+VALUES ('Họp cố vấn học tập sinh viên', 'Online Teams', '2026-05-10 19:00:00', '2026-05-10 20:00:00', TRUE);
 
 INSERT INTO Reminders (appointment_id, reminder_type, target_time, message)
 VALUES (1, 1, '1 hour', '2026-06-10 06:00:00', 'Chuẩn bị slide bảo vệ!');
