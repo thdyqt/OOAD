@@ -105,13 +105,12 @@ public class AppointmentListPanel extends JPanel {
         btnDelete.addActionListener(e -> handleDelete());
         btnEdit.addActionListener(e -> handleEdit());
 
-        loadData(calendarId);
+        loadData();
     }
 
-    public void loadData(int calendarId) {
-        this.currentCalendarId = calendarId;
+    public void loadData() {
         tableModel.setRowCount(0);
-        currentList = AppointmentManager.getUpcomingAppointmentsByCalendar();
+        currentList = AppointmentManager.getUpcomingAppointments();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm dd/MM/yyyy");
         for (Appointment apt : currentList) {
