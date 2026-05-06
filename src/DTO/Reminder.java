@@ -18,7 +18,6 @@ public class Reminder {
 
     private int reminderId;
     private int appointmentId;
-    private int userId;
     private ReminderType reminderType;
     private LocalDateTime targetTime;
     private String message; 
@@ -27,18 +26,8 @@ public class Reminder {
     //constructors
     public Reminder() {}
     
-    public Reminder(int appointmentId, int userId, ReminderType reminderType, LocalDateTime targetTime, String message) {
+    public Reminder(int appointmentId, ReminderType reminderType, LocalDateTime targetTime, String message) {
         this.appointmentId = appointmentId;
-        this.userId = userId;
-        this.reminderType = reminderType;
-        this.targetTime = targetTime;
-        this.message = message;
-    }
-    
-    public Reminder(int reminderId, int appointmentId, int userId, ReminderType reminderType, LocalDateTime targetTime, String message) {
-        this.reminderId = reminderId;
-        this.appointmentId = appointmentId;
-        this.userId = userId;
         this.reminderType = reminderType;
         this.targetTime = targetTime;
         this.message = message;
@@ -59,10 +48,6 @@ public class Reminder {
 
     public void setAppointmentId(int appointmentId) {
         this.appointmentId = appointmentId;
-    }
-
-    public int getUserId() {
-        return userId;
     }
 
     public ReminderType getReminderType() {
