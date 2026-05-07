@@ -11,7 +11,6 @@ public class ReminderDAL {
         List<Reminder> list = new ArrayList<>();
         String sql = "SELECT DISTINCT r.* FROM Reminders r " +
                 "JOIN Appointments a ON r.appointment_id = a.appointment_id " +
-                "LEFT JOIN Meeting_Participants mp ON a.appointment_id = mp.appointment_id " +
                 "AND r.target_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY) " +
                 "ORDER BY r.target_time ASC";
 

@@ -1,21 +1,16 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author Admin
- */
 public class Appointment {
+    //attributes
     private int appointmentId;
     private String name;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
+    //methods
+    //constructors
     public Appointment() {}
 
     public Appointment(int appointmentId, String name, LocalDateTime startTime, LocalDateTime endTime) {
@@ -25,10 +20,10 @@ public class Appointment {
         this.endTime = endTime;
     }
 
+    //get-set
     public int getAppointmentId() {
         return appointmentId;
     }
-
     public void setAppointmentId(int appointmentId) {
         this.appointmentId = appointmentId;
     }
@@ -36,7 +31,6 @@ public class Appointment {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -44,7 +38,6 @@ public class Appointment {
     public LocalDateTime getStartTime() {
         return startTime;
     }
-
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
@@ -52,7 +45,6 @@ public class Appointment {
     public LocalDateTime getEndTime() {
         return endTime;
     }
-
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
