@@ -1,15 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+//only purpose is to make some buttons
 package VIEW;
 
-/**
- *
- * @author Admin
- */
 import javax.swing.*;
 import java.awt.*;
+
 
 public class RoundedButton extends JButton {
     private int radius;
