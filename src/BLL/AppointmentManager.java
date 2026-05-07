@@ -44,13 +44,13 @@ public class AppointmentManager {
     }
 
     public static Appointment checkTimeConflict(LocalDateTime startTime, LocalDateTime endTime, int currentAppointmentId) {
-        for (Appointment ap : AppointmentDAL.getAppointments()) {
-            if (ap.getAppointmentId() == currentAppointmentId) {
+        for (Appointment appointment : AppointmentDAL.getAppointments()) {
+            if (appointment.getAppointmentId() == currentAppointmentId) {
                 continue;
             }
 
-            if (startTime.isBefore(ap.getEndTime()) && endTime.isAfter(ap.getStartTime())) {
-                return ap;
+            if (startTime.isBefore(appointment.getEndTime()) && endTime.isAfter(appointment.getStartTime())) {
+                return appointment;
             }
         }
         return null;
