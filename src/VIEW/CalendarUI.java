@@ -13,9 +13,6 @@ public class CalendarUI extends JFrame {
     private YearMonth currentYearMonth;
     private LocalDate selectedDate;
 
-    private JComboBox<DTO.Calendar> comboCalendars;
-    private Calendar currentCalendar;
-
     private JComboBox<String> comboMonth;
     private JSpinner spinYear;
     private JPanel panelDays;
@@ -104,7 +101,7 @@ public class CalendarUI extends JFrame {
         comboCalendars.addActionListener(e -> {
             if (comboCalendars.getSelectedItem() != null) {
                 this.currentCalendar = (DTO.Calendar) comboCalendars.getSelectedItem();
-                int cid = currentCalendar.getCalendarId();
+
 
                 if (appointmentListPanel != null) {
                     appointmentListPanel.loadData(cid);
@@ -149,7 +146,7 @@ public class CalendarUI extends JFrame {
         btnAddCal.addActionListener(e -> {
             String name = JOptionPane.showInputDialog(this, "Nhập tên lịch mới:");
             if (name != null && !name.trim().isEmpty()) {
-                String res = BLL.CalendarManager.addCalendar(currentUser.getUserId(), name);
+                String res = BLL.CalendarManager.addCalendar();
                 if (res.equals("SUCCESS")) {
                     refreshCalendarList();
                 } else {

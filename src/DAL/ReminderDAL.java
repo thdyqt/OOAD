@@ -34,13 +34,13 @@ public class ReminderDAL {
     }
 
     public static boolean insertReminder(Reminder reminder) {
-        String sql = "INSERT INTO Reminders (appointment_id, reminder_type, target_time, message) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Reminders (appointment_id, reminder_type, target_time, message) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, reminder.getAppointmentId());
-            stmt.setString(3, String.valueOf(reminder.getReminderType()));
-            stmt.setTimestamp(4, Timestamp.valueOf(reminder.getTargetTime()));
-            stmt.setString(5, reminder.getMessage());
+            stmt.setString(2, String.valueOf(reminder.getReminderType()));
+            stmt.setTimestamp(3, Timestamp.valueOf(reminder.getTargetTime()));
+            stmt.setString(4, reminder.getMessage());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) { return false; }
     }
@@ -57,22 +57,20 @@ public class ReminderDAL {
         } catch (SQLException e) { return false; }
     }
 
-    public static boolean deleteReminder(int reminderId, int userId) {
-        String sql = "DELETE FROM Reminders WHERE reminder_id = ? AND user_id = ?";
+    public static boolean deleteReminder(int reminderId) {
+        String sql = "DELETE FROM Reminders WHERE reminder_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, reminderId);
-            stmt.setInt(2, userId);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) { return false; }
     }
 
     public static boolean deleteRemindersByAppointmentId(int appointmentId, int userId) {
-        String sql = "DELETE FROM Reminders WHERE appointment_id = ? AND user_id = ?";
+        String sql = "DELETE FROM Reminders WHERE appointment_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, appointmentId);
-            stmt.setInt(2, userId);
             stmt.executeUpdate();
             return true;
         } catch (SQLException e) { return false; }
