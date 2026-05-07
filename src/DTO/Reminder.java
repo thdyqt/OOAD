@@ -55,7 +55,7 @@ public class Reminder {
         return reminderType;
     }
 
-    public static void setReminderType(ReminderType reminderType) {
+    public void setReminderType(ReminderType reminderType) {
         this.reminderType = reminderType;
     }
 
