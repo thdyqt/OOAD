@@ -27,16 +27,13 @@ public class AppointmentDAL {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Appointment apt = new Appointment();
-                    apt.setAppointmentId(rs.getInt("appointment_id"));
-                    apt.setCalendarId(rs.getInt("calendar_id"));
-                    apt.setName(rs.getString("name"));
-                    apt.setLocation(rs.getString("location"));
-                    apt.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
-                    apt.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
-                    apt.setIsGroupMeeting(rs.getBoolean("is_group_meeting"));
-                    
-                    list.add(apt); 
+                    Appointment appointment = new Appointment();
+                    appointment.setAppointmentId(rs.getInt("appointment_id"));
+                    appointment.setName(rs.getString("name"));
+                    appointment.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
+                    appointment.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
+
+                    list.add(appointment); 
                 }
             }
         } catch (SQLException e) {}
@@ -44,7 +41,7 @@ public class AppointmentDAL {
     }
 
     public static Appointment getAppointmentById(int appointmentId) {
-        Appointment apt = null;
+        Appointment appointment = null;
         String sql = "SELECT * FROM Appointments WHERE appointment_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
@@ -54,59 +51,28 @@ public class AppointmentDAL {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    apt = new Appointment();
-                    apt.setAppointmentId(rs.getInt("appointment_id"));
-                    apt.setCalendarId(rs.getInt("calendar_id"));
-                    apt.setName(rs.getString("name"));
-                    apt.setLocation(rs.getString("location"));
-                    apt.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
-                    apt.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
-                    apt.setIsGroupMeeting(rs.getBoolean("is_group_meeting"));
+                    appointment = new Appointment();
+                    appointment.setAppointmentId(rs.getInt("appointment_id"));
+                    appointment.setName(rs.getString("name"));
+                    appointment.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
+                    appointment.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return apt;
+        return appointment;
     }
 
-    public static Appointment findGroupMeeting(String name, LocalDateTime start, LocalDateTime end) {
-        String sql = "SELECT * FROM Appointments WHERE name = ? AND start_time = ? AND end_time = ? AND is_group_meeting = TRUE LIMIT 1";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, name);
-            stmt.setTimestamp(2, Timestamp.valueOf(start));
-            stmt.setTimestamp(3, Timestamp.valueOf(end));
-            ResultSet rs = stmt.executeQuery();
-
-            if (rs.next()) {
-                Appointment apt = new Appointment();
-                apt.setAppointmentId(rs.getInt("appointment_id"));
-                apt.setCalendarId(rs.getInt("calendar_id"));
-                apt.setName(rs.getString("name"));
-                apt.setLocation(rs.getString("location"));
-                apt.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
-                apt.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
-                apt.setIsGroupMeeting(rs.getBoolean("is_group_meeting"));
-                return apt;
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return null;
-    }
-
-    public static int insertAppointment(Appointment apt) {
-        String sql = "INSERT INTO Appointments (calendar_id, name, location, start_time, end_time, is_group_meeting) VALUES (?, ?, ?, ?, ?, ?)";
+    public static int insertAppointment(Appointment appointment) {
+        String sql = "INSERT INTO Appointments (name, start_time, end_time) VALUES (?, ?, ?)";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            stmt.setInt(1, apt.getCalendarId());
-            stmt.setString(2, apt.getName());
-            stmt.setString(3, apt.getLocation());
-            stmt.setTimestamp(4, Timestamp.valueOf(apt.getStartTime()));
-            stmt.setTimestamp(5, Timestamp.valueOf(apt.getEndTime()));
-            stmt.setBoolean(6, apt.isGroupMeeting());
+            stmt.setString(1, appointment.getName());
+            stmt.setTimestamp(2, Timestamp.valueOf(appointment.getStartTime()));
+            stmt.setTimestamp(3, Timestamp.valueOf(appointment.getEndTime()));
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows > 0) {
@@ -114,7 +80,7 @@ public class AppointmentDAL {
                     if (generatedKeys.next()) {
                         int newId = generatedKeys.getInt(1);
 
-                        apt.setAppointmentId(newId);
+                        appointment.setAppointmentId(newId);
 
                         return newId;
                     }
@@ -127,18 +93,16 @@ public class AppointmentDAL {
         }
     }
     
-    public static boolean updateAppointment(Appointment appt) {
-        String sql = "UPDATE Appointments SET name = ?, location = ?, start_time = ?, end_time = ?, is_group_meeting = ? WHERE appointment_id = ?";
+    public static boolean updateAppointment(Appointment appointment) {
+        String sql = "UPDATE Appointments SET name = ?, start_time = ?, end_time = ?, WHERE appointment_id = ?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, appt.getName());
-            stmt.setString(2, appt.getLocation());
-            stmt.setTimestamp(3, Timestamp.valueOf(appt.getStartTime()));
-            stmt.setTimestamp(4, Timestamp.valueOf(appt.getEndTime()));
-            stmt.setBoolean(5, appt.isGroupMeeting());    
-            stmt.setInt(6, appt.getAppointmentId());
+            stmt.setString(1, appointment.getName());
+            stmt.setTimestamp(2, Timestamp.valueOf(appointment.getStartTime()));
+            stmt.setTimestamp(3, Timestamp.valueOf(appointment.getEndTime()));
+            stmt.setInt(4, appointment.getAppointmentId());
             
             return stmt.executeUpdate() > 0;
             
@@ -160,54 +124,23 @@ public class AppointmentDAL {
         }
     }
 
-    public static boolean removeMeetingParticipant(int appointmentId, int userId) {
-        String sql = "DELETE FROM Meeting_Participants WHERE appointment_id = ? AND user_id = ?";
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, appointmentId);
-            stmt.setInt(2, userId);
-            return stmt.executeUpdate() > 0;
-        } catch (Exception e){ return false; }
-    }
-
-    public static boolean addMeetingParticipant(int appointmentId, int userId) {
-        String sql = "INSERT INTO meeting_participants (appointment_id, user_id) VALUES ( ?, ?)";
-
-        try (Connection con = DBConnection.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)){
-
-            stmt.setInt(1, appointmentId);
-            stmt.setInt(2, userId);
-
-            return stmt.executeUpdate() > 0;
-        } catch (Exception e){
-            return false;
-        }
-    }
-
-    public static List<Appointment> getUpcomingAppointmentsByCalendar(int calendarId, int userId) {
+    public static List<Appointment> getUpcomingAppointmentsByCalendar() {
         List<Appointment> list = new ArrayList<>();
         String sql = "SELECT DISTINCT a.* FROM Appointments a " +
-                "LEFT JOIN Meeting_Participants mp ON a.appointment_id = mp.appointment_id " +
-                "WHERE (a.calendar_id = ? OR mp.user_id = ?) AND a.end_time >= NOW() " +
+                "WHERE a.end_time >= NOW() " +
                 "ORDER BY a.start_time ASC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setInt(1, calendarId);
-            stmt.setInt(2, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Appointment apt = new Appointment();
-                    apt.setAppointmentId(rs.getInt("appointment_id"));
-                    apt.setCalendarId(rs.getInt("calendar_id"));
-                    apt.setName(rs.getString("name"));
-                    apt.setLocation(rs.getString("location"));
-                    apt.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
-                    apt.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
-                    apt.setIsGroupMeeting(rs.getBoolean("is_group_meeting"));
-                    list.add(apt);
+                    Appointment appointment = new Appointment();
+                    appointment.setAppointmentId(rs.getInt("appointment_id"));
+                    appointment.setName(rs.getString("name"));
+                    appointment.setStartTime(rs.getTimestamp("start_time").toLocalDateTime());
+                    appointment.setEndTime(rs.getTimestamp("end_time").toLocalDateTime());
+                    list.add(appointment);
                 }
             }
         } catch (SQLException e) {

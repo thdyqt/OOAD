@@ -26,7 +26,8 @@ public class Reminder {
     //constructors
     public Reminder() {}
     
-    public Reminder(int appointmentId, ReminderType reminderType, LocalDateTime targetTime, String message) {
+    public Reminder(int reminderId, int appointmentId, ReminderType reminderType, LocalDateTime targetTime, String message) {
+        this.reminderId = reminderId;
         this.appointmentId = appointmentId;
         this.reminderType = reminderType;
         this.targetTime = targetTime;
@@ -54,7 +55,7 @@ public class Reminder {
         return reminderType;
     }
 
-    public void setReminderType(ReminderType reminderType) {
+    public static void setReminderType(ReminderType reminderType) {
         this.reminderType = reminderType;
     }
 
