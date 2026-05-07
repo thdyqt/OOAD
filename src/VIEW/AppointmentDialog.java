@@ -22,8 +22,8 @@ public class AppointmentDialog extends JDialog {
     private RoundedButton btnSave;
     private RoundedButton btnCancel;
 
-    private User currentUser;
-    private int currentCalendarId;
+
+
     private LocalDate selectedDate;
     private Appointment appointmentToEdit;
 
@@ -242,24 +242,6 @@ public class AppointmentDialog extends JDialog {
             return;
         }
 
-        // 1. KIỂM TRA XEM CÓ GROUP MEETING NÀO KHÔNG
-        Appointment existingGroup = BLL.AppointmentManager.checkGroupMeeting(name, startTime, endTime);
-        if (existingGroup != null) {
-            int choice = JOptionPane.showConfirmDialog(this,
-                    "Hệ thống phát hiện một Cuộc họp nhóm đang diễn ra với cùng tên và thời gian.\nBạn có muốn THAM GIA vào cuộc họp này thay vì tạo mới không?",
-                    "Xác nhận tham gia nhóm", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-
-            if (choice == JOptionPane.YES_OPTION) {
-                boolean joined = BLL.AppointmentManager.joinExistingMeeting(existingGroup.getAppointmentId(), currentUser.getUserId());
-                if (joined) {
-                    JOptionPane.showMessageDialog(this, "Bạn đã được thêm vào danh sách thành viên của cuộc họp nhóm!");
-                    this.dispose();
-                } else {
-                    JOptionPane.showMessageDialog(this, "Lỗi: Bạn đã ở trong nhóm này rồi.", "Lỗi", JOptionPane.ERROR_MESSAGE);
-                }
-                return;
-            }
-        }
 
         // 2. KIỂM TRA TRÙNG LỊCH (GHI ĐÈ)
         int currentId = (appointmentToEdit != null) ? appointmentToEdit.getAppointmentId() : -1;

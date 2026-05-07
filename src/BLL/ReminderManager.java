@@ -4,7 +4,7 @@
  */
 package BLL;
 
-import DAL.DBConnection;
+
 import DAL.ReminderDAL;
 import DTO.Reminder;
 
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class ReminderManager {
     public static List<Reminder> getRemindersByCalendar_24H(int calendarId, int userId) {
-        return ReminderDAL.getRemindersByCalendar_24H(calendarId, userId);
+        return ReminderDAL.getRemindersByCalendar_24H();
     }
 
     public static String addReminder(Reminder reminder) {

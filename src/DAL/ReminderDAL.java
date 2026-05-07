@@ -1,29 +1,29 @@
 package DAL;
 
+import BLL.DBConnection;
 import DTO.Reminder;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ReminderDAL {
-    public static List<Reminder> getRemindersByCalendar_24H(int calendarId, int userId) {
+    public static List<Reminder> getRemindersByCalendar_24H() {
         List<Reminder> list = new ArrayList<>();
         String sql = "SELECT DISTINCT r.* FROM Reminders r " +
                 "JOIN Appointments a ON r.appointment_id = a.appointment_id " +
                 "LEFT JOIN Meeting_Participants mp ON a.appointment_id = mp.appointment_id " +
-                "WHERE (a.calendar_id = ?)" +
                 "AND r.target_time BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 1 DAY) " +
                 "ORDER BY r.target_time ASC";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, calendarId);
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(new Reminder(
                             rs.getInt("reminder_id"),
                             rs.getInt("appointment_id"),
-                            rs.getString("reminder_type"),
+                            Reminder.ReminderType.valueOf(rs.getString("reminder_type")),
                             rs.getTimestamp("target_time").toLocalDateTime(),
                             rs.getString("message")
                     ));
@@ -38,7 +38,7 @@ public class ReminderDAL {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, reminder.getAppointmentId());
-            stmt.setString(2, reminder.getReminderType());
+            stmt.setString(2, String.valueOf(reminder.getReminderType()));
             stmt.setTimestamp(3, Timestamp.valueOf(reminder.getTargetTime()));
             stmt.setString(4, reminder.getMessage());
             return stmt.executeUpdate() > 0;
@@ -49,7 +49,7 @@ public class ReminderDAL {
         String sql = "UPDATE Reminders SET reminder_type = ?, target_time = ?, message = ? WHERE reminder_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, reminder.getReminderType());
+            stmt.setString(1, String.valueOf(reminder.getReminderType()));
             stmt.setTimestamp(2, Timestamp.valueOf(reminder.getTargetTime()));
             stmt.setString(3, reminder.getMessage());
             stmt.setInt(4, reminder.getReminderId());
