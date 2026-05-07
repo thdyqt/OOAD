@@ -1,15 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author Admin
- */
 public class Reminder {
     //attributes
     public enum ReminderType{
@@ -44,7 +36,6 @@ public class Reminder {
     public int getReminderId() {
         return reminderId;
     }
-
     public void setReminderId(int reminderId) {
         this.reminderId = reminderId;
     }
@@ -52,15 +43,11 @@ public class Reminder {
     public int getAppointmentId() {
         return appointmentId;
     }
-
-    public void setAppointmentId(int appointmentId) {
-        this.appointmentId = appointmentId;
-    }
+    public void setAppointmentId(int appointmentId) {this.appointmentId = appointmentId;}
 
     public ReminderType getReminderType() {
         return reminderType;
     }
-
     public void setReminderType(ReminderType reminderType) {
         this.reminderType = reminderType;
     }
@@ -68,15 +55,11 @@ public class Reminder {
     public LocalDateTime getTargetTime() {
         return targetTime;
     }
-
     public void setTargetTime(LocalDateTime targetTime) {
         this.targetTime = targetTime;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
+    public String getMessage() {return message;}
     public void setMessage(String message) {
         this.message = message;
     }
