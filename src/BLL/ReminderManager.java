@@ -18,7 +18,7 @@ import java.util.List;
  * @author Admin
  */
 public class ReminderManager {
-    public static List<Reminder> getRemindersByCalendar_24H(int calendarId, int userId) {
+    public static List<Reminder> getRemindersByCalendar_24H() {
         return ReminderDAL.getRemindersByCalendar_24H();
     }
 
@@ -52,11 +52,11 @@ public class ReminderManager {
         return success ? "SUCCESS" : "Lỗi hệ thống khi cập nhật nhắc nhở.";
     }
 
-    public static boolean deleteReminder(int reminderId, int userId) {
+    public static boolean deleteReminder(int reminderId) {
         return DAL.ReminderDAL.deleteReminder(reminderId);
     }
 
-    public static boolean deleteRemindersByAppointmentId(int appointmentId, int userId) {
-        return DAL.ReminderDAL.deleteRemindersByAppointmentId(appointmentId, userId);
+    public static boolean deleteRemindersByAppointmentId(int appointmentId) {
+        return DAL.ReminderDAL.deleteRemindersByAppointmentId(appointmentId);
     }
 }

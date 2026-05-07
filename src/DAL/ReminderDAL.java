@@ -66,7 +66,7 @@ public class ReminderDAL {
         } catch (SQLException e) { return false; }
     }
 
-    public static boolean deleteRemindersByAppointmentId(int appointmentId, int userId) {
+    public static boolean deleteRemindersByAppointmentId(int appointmentId) {
         String sql = "DELETE FROM Reminders WHERE appointment_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

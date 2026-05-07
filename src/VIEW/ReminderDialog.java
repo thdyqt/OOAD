@@ -86,6 +86,7 @@ public class ReminderDialog extends JDialog {
             "Trước 10 phút",
             "Trước 30 phút",
             "Trước 1 giờ",
+            "Trước 12 giờ",
             "Trước 1 ngày"
         };
         comboTime = new JComboBox<>(timeOptions);
@@ -145,31 +146,35 @@ public class ReminderDialog extends JDialog {
     private void handleSaveReminder() {
         int selectedIndex = comboTime.getSelectedIndex();
         LocalDateTime targetTime = currentApt.getStartTime();
-        String type = "AT_START";
+        Reminder.ReminderType type = Reminder.ReminderType.NOW;
 
         switch (selectedIndex) {
             case 1:
                 targetTime = targetTime.minusMinutes(10);
-                type = "10_MIN_BEFORE";
+                type = Reminder.ReminderType.M10;
                 break;
             case 2:
                 targetTime = targetTime.minusMinutes(30);
-                type = "30_MIN_BEFORE";
+                type = Reminder.ReminderType.M30;
                 break;
             case 3:
                 targetTime = targetTime.minusHours(1);
-                type = "1_HOUR_BEFORE";
+                type = Reminder.ReminderType.H1;
                 break;
             case 4:
+                targetTime = targetTime.minusHours(12);
+                type = Reminder.ReminderType.H12;
+                break;
+            case 5:
                 targetTime = targetTime.minusDays(1);
-                type = "1_DAY_BEFORE";
+                type = Reminder.ReminderType.H24;
                 break;
         }
 
         String msg = txtMessage.getText().trim();
 
         if (reminderToEdit != null) {
-            reminderToEdit.setReminderType(Reminder.ReminderType.valueOf(type));
+            reminderToEdit.setReminderType(type);
             reminderToEdit.setTargetTime(targetTime);
             reminderToEdit.setMessage(msg);
 
@@ -182,7 +187,7 @@ public class ReminderDialog extends JDialog {
             }
 
         } else {
-            Reminder reminder = new Reminder(currentApt.getAppointmentId(), currentUserId, type, targetTime, msg);
+            Reminder reminder = new Reminder(currentApt.getAppointmentId(), type , targetTime, msg);
             String result = ReminderManager.addReminder(reminder);
 
             if (result.equals("SUCCESS")) {
