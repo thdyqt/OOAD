@@ -43,14 +43,14 @@ public class AppointmentManager {
         return AppointmentDAL.deleteAppointment(appointmentId);
     }
 
-    public static Appointment checkTimeConflict(int calendarId, LocalDateTime startTime, LocalDateTime endTime, int currentAppointmentId) {
-        for (Appointment ap : AppointmentDAL.getAppointments(calendarId)) {
-            if (ap.getAppointmentId() == currentAppointmentId) {
+    public static Appointment checkTimeConflict(LocalDateTime startTime, LocalDateTime endTime, int currentAppointmentId) {
+        for (Appointment appointment : AppointmentDAL.getAppointments()) {
+            if (appointment.getAppointmentId() == currentAppointmentId) {
                 continue;
             }
 
-            if (startTime.isBefore(ap.getEndTime()) && endTime.isAfter(ap.getStartTime())) {
-                return ap;
+            if (startTime.isBefore(appointment.getEndTime()) && endTime.isAfter(appointment.getStartTime())) {
+                return appointment;
             }
         }
         return null;
