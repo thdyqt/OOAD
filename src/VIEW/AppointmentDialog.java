@@ -263,7 +263,7 @@ public class AppointmentDialog extends JDialog {
 
                 boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), tempAppt);
                 if (replaced) {
-                    ReminderManager.deleteRemindersByAppointmentId(conflictAppt.getAppointmentId(), currentUser.getUserId());
+                    ReminderManager.deleteRemindersByAppointmentId(conflictAppt.getAppointmentId());
                     ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, tempAppt, null, currentUser.getUserId());
                     dialog.setVisible(true);
                     this.dispose();

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class Reminder {
     //attributes
     public enum ReminderType{
-        H24, H12, H1, M30, M10
+        H24, H12, H1, M30, M10, NOW
     }
 
     private int reminderId;
@@ -20,6 +20,12 @@ public class Reminder {
     
     public Reminder(int reminderId, int appointmentId, ReminderType reminderType, LocalDateTime targetTime, String message) {
         this.reminderId = reminderId;
+        this.appointmentId = appointmentId;
+        this.reminderType = reminderType;
+        this.targetTime = targetTime;
+        this.message = message;
+    }
+    public Reminder( int appointmentId, ReminderType reminderType, LocalDateTime targetTime, String message) {
         this.appointmentId = appointmentId;
         this.reminderType = reminderType;
         this.targetTime = targetTime;
@@ -57,6 +63,9 @@ public class Reminder {
     public void setMessage(String message) {
         this.message = message;
     }
+
+    
+    
 }
 
 

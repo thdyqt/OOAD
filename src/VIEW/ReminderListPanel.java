@@ -107,19 +107,20 @@ public class ReminderListPanel extends JPanel {
     public void refreshReminders(int calendarId) {
         this.currentCalendarId = calendarId;
         tableModel.setRowCount(0);
-        currentList = ReminderManager.getRemindersByCalendar_24H(calendarId, current_UserID);
+        currentList = ReminderManager.getRemindersByCalendar_24H();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm - dd/MM/yyyy");
         for (Reminder r : currentList) {
             Appointment currentApt = AppointmentManager.getAppointmentById(r.getAppointmentId());
 
-            String typeStr = r.getReminderType();
+            String typeStr = r.getReminderType().toString();
             switch (typeStr) {
-                case "AT_START": typeStr = "Tại lúc bắt đầu"; break;
-                case "10_MIN_BEFORE": typeStr = "Trước 10 phút"; break;
-                case "30_MIN_BEFORE": typeStr = "Trước 30 phút"; break;
-                case "1_HOUR_BEFORE": typeStr = "Trước 1 giờ"; break;
-                case "1_DAY_BEFORE": typeStr = "Trước 1 ngày"; break;
+                case "NOW": typeStr = "Tại lúc bắt đầu"; break;
+                case "M10": typeStr = "Trước 10 phút"; break;
+                case "M30": typeStr = "Trước 30 phút"; break;
+                case "H1": typeStr = "Trước 1 giờ"; break;
+                case "H12": typeStr = "Trước 12 giờ"; break;
+                case "H24": typeStr = "Trước 1 ngày"; break;
                 default: typeStr = "Không rõ"; break;
             }
 
@@ -164,7 +165,7 @@ public class ReminderListPanel extends JPanel {
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa thông báo này?", "Xác nhận", JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
-            boolean success = ReminderManager.deleteReminder(reminderId, current_UserID);
+            boolean success = ReminderManager.deleteReminder(reminderId);
             if (success) {
                 JOptionPane.showMessageDialog(this, "Đã xóa nhắc nhở thành công!");
                 refreshReminders(currentCalendarId);
