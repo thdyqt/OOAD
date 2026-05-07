@@ -1,5 +1,6 @@
 package DAL;
 
+import BLL.DBConnection;
 import DTO.Reminder;
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,12 +17,13 @@ public class ReminderDAL {
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     list.add(new Reminder(
                             rs.getInt("reminder_id"),
                             rs.getInt("appointment_id"),
-                            rs.getString("reminder_type"),
+                            Reminder.ReminderType.valueOf(rs.getString("reminder_type")),
                             rs.getTimestamp("target_time").toLocalDateTime(),
                             rs.getString("message")
                     ));

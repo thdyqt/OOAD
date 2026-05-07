@@ -12,25 +12,25 @@ import java.util.List;
 
 public class AppointmentManager {
     public static List<Appointment> getUpcomingAppointments() {
-        return AppointmentDAL.getUpcomingAppointments();
+        return AppointmentDAL.getAppointments();
     }
 
     public static Appointment getAppointmentById(int appointmentId) {
         return AppointmentDAL.getAppointmentById(appointmentId);
     }
 
-    public static String addAppointment(Appointment apt) {
-        if (apt.getName() == null || apt.getName().trim().isEmpty()) {
+    public static String addAppointment(Appointment appointment) {
+        if (appointment.getName() == null || appointment.getName().trim().isEmpty()) {
             return "Tên cuộc hẹn không được để trống!";
         }
-        if (apt.getStartTime().isBefore(java.time.LocalDateTime.now())) {
+        if (appointment.getStartTime().isBefore(java.time.LocalDateTime.now())) {
             return "Không thể thêm cuộc hẹn vào thời gian hoặc ngày đã qua!";
         }
-        if (apt.getStartTime().isAfter(apt.getEndTime()) || apt.getStartTime().isEqual(apt.getEndTime())) {
+        if (appointment.getStartTime().isAfter(appointment.getEndTime()) || appointment.getStartTime().isEqual(appointment.getEndTime())) {
             return "Thời gian kết thúc phải diễn ra sau thời gian bắt đầu!";
         }
 
-        int isSuccess = AppointmentDAL.insertAppointment(apt);
+        int isSuccess = AppointmentDAL.insertAppointment(appointment);
         
         if (isSuccess > 0) {
             return "SUCCESS";
@@ -43,9 +43,8 @@ public class AppointmentManager {
         return AppointmentDAL.deleteAppointment(appointmentId);
     }
 
-
     public static Appointment checkTimeConflict(int calendarId, LocalDateTime startTime, LocalDateTime endTime, int currentAppointmentId) {
-        for (Appointment ap : AppointmentDAL.getAllAppointments()) {
+        for (Appointment ap : AppointmentDAL.getAppointments(calendarId)) {
             if (ap.getAppointmentId() == currentAppointmentId) {
                 continue;
             }

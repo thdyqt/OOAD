@@ -169,7 +169,7 @@ public class ReminderDialog extends JDialog {
         String msg = txtMessage.getText().trim();
 
         if (reminderToEdit != null) {
-            reminderToEdit.setReminderType(type);
+            reminderToEdit.setReminderType(Reminder.ReminderType.valueOf(type));
             reminderToEdit.setTargetTime(targetTime);
             reminderToEdit.setMessage(msg);
 
