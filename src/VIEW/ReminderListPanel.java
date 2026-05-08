@@ -22,11 +22,9 @@ public class ReminderListPanel extends JPanel {
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_DANGER = new Color(220, 53, 69);
 
-    public ReminderListPanel(int userId, int calendarId) {
-        this.current_UserID = userId;
-        this.currentCalendarId = calendarId;
+    public ReminderListPanel() {
         initComponents();
-        refreshReminders(currentCalendarId);
+        refreshReminders();
     }
 
     private void initComponents() {
@@ -104,8 +102,7 @@ public class ReminderListPanel extends JPanel {
         btnDelete.addActionListener(e -> handleDelete());
     }
 
-    public void refreshReminders(int calendarId) {
-        this.currentCalendarId = calendarId;
+    public void refreshReminders() {
         tableModel.setRowCount(0);
         currentList = ReminderManager.getRemindersByCalendar_24H();
 
@@ -149,9 +146,9 @@ public class ReminderListPanel extends JPanel {
             return;
         }
 
-        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentApt, selectedReminder, current_UserID);
+        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentApt, selectedReminder);
         dialog.setVisible(true);
-        refreshReminders(currentCalendarId);
+        refreshReminders();
     }
 
     private void handleDelete() {
@@ -168,7 +165,7 @@ public class ReminderListPanel extends JPanel {
             boolean success = ReminderManager.deleteReminder(reminderId);
             if (success) {
                 JOptionPane.showMessageDialog(this, "Đã xóa nhắc nhở thành công!");
-                refreshReminders(currentCalendarId);
+                refreshReminders();
             } else {
                 JOptionPane.showMessageDialog(this, "Lỗi hệ thống khi xóa!", "Lỗi", JOptionPane.ERROR_MESSAGE);
             }

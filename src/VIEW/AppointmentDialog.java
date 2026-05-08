@@ -32,7 +32,7 @@ public class AppointmentDialog extends JDialog {
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
     private final Color COLOR_BORDER = new Color(210, 215, 220);
 
-    public AppointmentDialog(Frame parent, boolean modal, LocalDate date, int calendarId, Appointment aptToEdit) {
+    public AppointmentDialog(Frame parent, boolean modal, LocalDate date, Appointment aptToEdit) {
         super(parent, modal);
         this.appointmentToEdit = aptToEdit;
 
@@ -92,6 +92,12 @@ public class AppointmentDialog extends JDialog {
         txtName = new JTextField();
         styleTextField(txtName);
         panelForm.add(txtName, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        JLabel lblLocation = new JLabel("Địa điểm:");
+        lblLocation.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        lblLocation.setForeground(COLOR_TEXT_DARK);
+        panelForm.add(lblLocation, gbc);
 
         gbc.gridx = 1; gbc.gridy = 1;
         txtLocation = new JTextField();
@@ -248,10 +254,11 @@ public class AppointmentDialog extends JDialog {
                 tempAppt.setStartTime(startTime);
                 tempAppt.setEndTime(endTime);
 
+
                 boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), tempAppt);
                 if (replaced) {
                     ReminderManager.deleteRemindersByAppointmentId(conflictAppt.getAppointmentId());
-                    ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, tempAppt, null, currentUser.getUserId());
+                    ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, tempAppt, null);
                     dialog.setVisible(true);
                     this.dispose();
                 } else {
@@ -284,11 +291,7 @@ public class AppointmentDialog extends JDialog {
             String result = BLL.AppointmentManager.addAppointment(newAppointment);
 
             if (result.equals("SUCCESS")) {
-                if (isGroup) {
-                    AppointmentManager.joinExistingMeeting(newAppointment.getAppointmentId(), currentUser.getUserId());
-                }
-
-                ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, newAppointment, null, currentUser.getUserId());
+                ReminderDialog dialog = new ReminderDialog(AppointmentDialog.this, true, newAppointment, null);
                 dialog.setVisible(true);
                 this.dispose();
             } else {
