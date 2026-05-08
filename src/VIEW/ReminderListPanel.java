@@ -16,8 +16,7 @@ public class ReminderListPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
     private List<Reminder> currentList;
-    private int currentCalendarId;
-    private int current_UserID;
+
 
     private final Color COLOR_PRIMARY = new Color(0, 86, 179);
     private final Color COLOR_DANGER = new Color(220, 53, 69);
