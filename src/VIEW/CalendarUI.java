@@ -248,8 +248,8 @@ public class CalendarUI extends JFrame {
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        appointmentListPanel = new AppointmentListPanel(currentUser, 0);
-        centralPanel = new ReminderListPanel(currentUser.getUserId(), 0);
+        appointmentListPanel = new AppointmentListPanel();
+        centralPanel = new ReminderListPanel();
 
         cardPanel.add(panelMainContent, "CALENDAR_VIEW");
         cardPanel.add(appointmentListPanel, "LIST_VIEW");
@@ -454,7 +454,7 @@ public class CalendarUI extends JFrame {
             return;
         }
 
-        AppointmentDialog addForm = new AppointmentDialog(this, true, currentUser, selectedDate, currentCalendar.getCalendarId(), null);
+        AppointmentDialog addForm = new AppointmentDialog(this, true, selectedDate, null);
         addForm.setVisible(true);
         renderCalendar();
     }

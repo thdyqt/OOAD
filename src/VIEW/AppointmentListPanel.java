@@ -18,10 +18,8 @@ public class AppointmentListPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
     private List<Appointment> currentList;
-    private int currentCalendarId;
 
-    public AppointmentListPanel(int calendarId) {
-        this.currentCalendarId = calendarId;
+    public AppointmentListPanel() {
         setLayout(new BorderLayout());
         setBackground(Color.WHITE);
         setBorder(BorderFactory.createEmptyBorder(20, 30, 20, 30));
@@ -129,9 +127,6 @@ public class AppointmentListPanel extends JPanel {
             return;
         }
 
-        Appointment selectedApt = currentList.get(selectedRow);
-        MeetingDetailDialog dialog = new MeetingDetailDialog((Frame) SwingUtilities.getWindowAncestor(this), true, selectedApt);
-        dialog.setVisible(true);
     }
 
     private void handleAddReminder() {
@@ -142,9 +137,9 @@ public class AppointmentListPanel extends JPanel {
         }
 
         Appointment selectedApt = currentList.get(selectedRow);
-        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, selectedApt, null, currentUser.getUserId());
+        ReminderDialog dialog = new ReminderDialog((Frame) SwingUtilities.getWindowAncestor(this), true, selectedApt, null);
         dialog.setVisible(true);
-        loadData(currentCalendarId);
+        loadData();
     }
 
     private void handleDelete() {
@@ -158,22 +153,12 @@ public class AppointmentListPanel extends JPanel {
         int aptId = selectedApt.getAppointmentId();
         String aptName = selectedApt.getName();
 
-        if (selectedApt.getCalendarId() != currentCalendarId) {
-            int confirm = JOptionPane.showConfirmDialog(this, "Bạn chỉ là khách. Bạn có muốn RỜI KHỎI cuộc họp nhóm này không?", "Xác nhận", JOptionPane.YES_NO_OPTION);
-            if (confirm == JOptionPane.YES_OPTION) {
-                if (AppointmentManager.leaveMeeting(aptId, currentUser.getUserId())) {
-                    JOptionPane.showMessageDialog(this, "Đã rời khỏi cuộc họp!");
-                    loadData(currentCalendarId);
-                }
-            }
-            return;
-        }
 
         int confirm = JOptionPane.showConfirmDialog(this, "Bạn có chắc chắn muốn xóa cuộc hẹn: '" + aptName + "'?", "Xác nhận", JOptionPane.YES_NO_OPTION);
         if (confirm == JOptionPane.YES_OPTION) {
             if (AppointmentManager.deleteAppointment(aptId)) {
                 JOptionPane.showMessageDialog(this, "Xóa thành công!");
-                loadData(currentCalendarId);
+                loadData();
             }
         }
     }
@@ -187,13 +172,9 @@ public class AppointmentListPanel extends JPanel {
 
         Appointment selectedApt = currentList.get(selectedRow);
 
-        if (selectedApt.getCalendarId() != currentCalendarId) {
-            JOptionPane.showMessageDialog(this, "Bạn chỉ là người tham gia, bạn không có quyền CHỈNH SỬA thông tin cuộc họp này!", "Từ chối quyền", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
 
-        AppointmentDialog editForm = new AppointmentDialog((Frame) SwingUtilities.getWindowAncestor(this), true, currentUser, null, 0, selectedApt);
+        AppointmentDialog editForm = new AppointmentDialog((Frame) SwingUtilities.getWindowAncestor(this), true, null, selectedApt);
         editForm.setVisible(true);
-        loadData(currentCalendarId);
+        loadData();
     }
 }

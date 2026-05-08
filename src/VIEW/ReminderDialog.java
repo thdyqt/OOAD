@@ -25,7 +25,7 @@ public class ReminderDialog extends JDialog {
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
     private final Color COLOR_BORDER = new Color(210, 215, 220);
 
-    public ReminderDialog(Window parent, boolean modal, Appointment apt, Reminder reminderToEdit, int currentUserId) {
+    public ReminderDialog(Window parent, boolean modal, Appointment apt, Reminder reminderToEdit) {
         super(parent, modal ? ModalityType.APPLICATION_MODAL : ModalityType.MODELESS);
         this.currentApt = apt;
         this.currentUserId = currentUserId;
