@@ -13,7 +13,7 @@ public class AppointmentDAL {
         List<Appointment> list = new ArrayList<>();
         String sql = "SELECT * FROM Appointments";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = BLL.DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
 
@@ -36,7 +36,7 @@ public class AppointmentDAL {
         Appointment appointment = null;
         String sql = "SELECT * FROM Appointments WHERE appointment_id = ?";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = BLL.DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, appointmentId);
@@ -59,7 +59,7 @@ public class AppointmentDAL {
     public static int insertAppointment(Appointment appointment) {
         String sql = "INSERT INTO Appointments (name, start_time, end_time) VALUES (?, ?, ?)";
 
-        try (Connection con = DBConnection.getConnection();
+        try (Connection con = BLL.DBConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, appointment.getName());
@@ -88,7 +88,7 @@ public class AppointmentDAL {
     public static boolean updateAppointment(Appointment appointment) {
         String sql = "UPDATE Appointments SET name = ?, start_time = ?, end_time = ?, WHERE appointment_id = ?";
         
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = BLL.DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, appointment.getName());
@@ -105,7 +105,7 @@ public class AppointmentDAL {
     
     public static boolean deleteAppointment(int appointmentId) {
         String sql = "DELETE FROM Appointments WHERE appointment_id = ?";
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = BLL.DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, appointmentId);
@@ -122,7 +122,7 @@ public class AppointmentDAL {
                 "WHERE a.end_time >= NOW() " +
                 "ORDER BY a.start_time ASC";
 
-        try (Connection conn = DBConnection.getConnection();
+        try (Connection conn = BLL.DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             try (ResultSet rs = stmt.executeQuery()) {
