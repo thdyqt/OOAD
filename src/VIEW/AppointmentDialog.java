@@ -32,13 +32,11 @@ public class AppointmentDialog extends JDialog {
     private final Color COLOR_TEXT_DARK = new Color(50, 50, 50);
     private final Color COLOR_BORDER = new Color(210, 215, 220);
 
-    public AppointmentDialog(Frame parent, boolean modal, User user, LocalDate date, int calendarId, Appointment aptToEdit) {
+    public AppointmentDialog(Frame parent, boolean modal, LocalDate date, int calendarId, Appointment aptToEdit) {
         super(parent, modal);
-        this.currentUser = user;
         this.appointmentToEdit = aptToEdit;
 
         this.selectedDate = aptToEdit != null ? aptToEdit.getStartTime().toLocalDate() : date;
-        this.currentCalendarId = aptToEdit != null ? aptToEdit.getCalendarId() : calendarId;
 
         setTitle(aptToEdit == null ? "Thêm Cuộc Hẹn" : "Chỉnh Sửa Cuộc Hẹn");
         setSize(480, 550);
@@ -94,12 +92,6 @@ public class AppointmentDialog extends JDialog {
         txtName = new JTextField();
         styleTextField(txtName);
         panelForm.add(txtName, gbc);
-
-        gbc.gridx = 0; gbc.gridy = 1;
-        JLabel lblLocation = new JLabel("Địa điểm:");
-        lblLocation.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        lblLocation.setForeground(COLOR_TEXT_DARK);
-        panelForm.add(lblLocation, gbc);
 
         gbc.gridx = 1; gbc.gridy = 1;
         txtLocation = new JTextField();
@@ -205,12 +197,10 @@ public class AppointmentDialog extends JDialog {
 
     private void fillDataForEdit() {
         txtName.setText(appointmentToEdit.getName());
-        txtLocation.setText(appointmentToEdit.getLocation());
         spinStartHour.setValue(appointmentToEdit.getStartTime().getHour());
         spinStartMinute.setValue(appointmentToEdit.getStartTime().getMinute());
         spinEndHour.setValue(appointmentToEdit.getEndTime().getHour());
         spinEndMinute.setValue(appointmentToEdit.getEndTime().getMinute());
-        chkGroup.setSelected(appointmentToEdit.isGroupMeeting());
 
         btnSave.setText("Cập nhật");
     }
@@ -245,7 +235,7 @@ public class AppointmentDialog extends JDialog {
 
         // 2. KIỂM TRA TRÙNG LỊCH (GHI ĐÈ)
         int currentId = (appointmentToEdit != null) ? appointmentToEdit.getAppointmentId() : -1;
-        Appointment conflictAppt = BLL.AppointmentManager.checkTimeConflict(currentCalendarId, startTime, endTime, currentId);
+        Appointment conflictAppt = BLL.AppointmentManager.checkTimeConflict(startTime, endTime, currentId);
 
         if (conflictAppt != null) {
             int choice = JOptionPane.showConfirmDialog(this,
@@ -254,12 +244,9 @@ public class AppointmentDialog extends JDialog {
 
             if (choice == JOptionPane.YES_OPTION) {
                 Appointment tempAppt = new Appointment();
-                tempAppt.setCalendarId(currentCalendarId);
                 tempAppt.setName(name);
-                tempAppt.setLocation(location);
                 tempAppt.setStartTime(startTime);
                 tempAppt.setEndTime(endTime);
-                tempAppt.setIsGroupMeeting(isGroup);
 
                 boolean replaced = BLL.AppointmentManager.replaceAppointment(conflictAppt.getAppointmentId(), tempAppt);
                 if (replaced) {
@@ -277,10 +264,8 @@ public class AppointmentDialog extends JDialog {
         // 3. NẾU KHÔNG CÓ GÌ BẤT THƯỜNG -> TẠO MỚI
         if (appointmentToEdit != null) {
             appointmentToEdit.setName(name);
-            appointmentToEdit.setLocation(location);
             appointmentToEdit.setStartTime(startTime);
             appointmentToEdit.setEndTime(endTime);
-            appointmentToEdit.setIsGroupMeeting(isGroup);
 
             boolean success = BLL.AppointmentManager.replaceAppointment(appointmentToEdit.getAppointmentId(), appointmentToEdit);
 
@@ -292,12 +277,9 @@ public class AppointmentDialog extends JDialog {
             }
         } else {
             Appointment newAppointment = new Appointment();
-            newAppointment.setCalendarId(currentCalendarId);
             newAppointment.setName(name);
-            newAppointment.setLocation(location);
             newAppointment.setStartTime(startTime);
             newAppointment.setEndTime(endTime);
-            newAppointment.setIsGroupMeeting(isGroup);
 
             String result = BLL.AppointmentManager.addAppointment(newAppointment);
 

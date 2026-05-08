@@ -1,9 +1,8 @@
-//only purpose is to make some buttons
+//make the button that is used everywhere
 package VIEW;
 
 import javax.swing.*;
 import java.awt.*;
-
 
 public class RoundedButton extends JButton {
     private int radius;
