@@ -1,6 +1,5 @@
 package VIEW;
 
-import DTO.User;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -11,12 +10,8 @@ import java.time.YearMonth;
 import java.util.List;
 
 public class CalendarUI extends JFrame {
-    private User currentUser;
     private YearMonth currentYearMonth;
     private LocalDate selectedDate;
-
-    private JComboBox<DTO.Calendar> comboCalendars;
-    private DTO.Calendar currentCalendar;
 
     private JComboBox<String> comboMonth;
     private JSpinner spinYear;
@@ -36,21 +31,23 @@ public class CalendarUI extends JFrame {
     private final Color COLOR_TEXT_DARK = new Color(33, 37, 41);
     private final Color COLOR_BORDER = new Color(226, 232, 240);
 
+    //buttons
+    //left
     private RoundedButton btnCalendar;
     private RoundedButton btnListAppointments;
     private RoundedButton btnListReminders;
+    //top right
     private RoundedButton btnPrev;
     private RoundedButton btnNext;
+    //bottom middle
     private RoundedButton btnToday;
     private RoundedButton btnAddAppointment;
-    private RoundedButton btnLogout;
 
-    public CalendarUI(User user) {
-        this.currentUser = user;
+    public CalendarUI() {
         this.currentYearMonth = YearMonth.now();
         this.selectedDate = LocalDate.now();
 
-        setTitle("Appointment Calendar");
+        setTitle("Calendar");
         setSize(1150, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -58,7 +55,7 @@ public class CalendarUI extends JFrame {
         getContentPane().setBackground(COLOR_BG);
 
         initComponents();
-        refreshCalendarList();
+        renderCalendar();
     }
 
     private void initComponents() {
@@ -78,15 +75,12 @@ public class CalendarUI extends JFrame {
         btnCalendar = createSidebarButton("Lịch của tôi", true);
         btnListAppointments = createSidebarButton("Danh sách Cuộc hẹn", false);
         btnListReminders = createSidebarButton("Trung tâm Thông báo", false);
-        btnLogout = createSidebarButton("Đăng xuất", false);
-        btnLogout.setForeground(new Color(220, 53, 69));
 
         panelSidebar.add(lblMenu);
         panelSidebar.add(btnCalendar);
         panelSidebar.add(btnListAppointments);
         panelSidebar.add(btnListReminders);
         panelSidebar.add(Box.createVerticalStrut(20));
-        panelSidebar.add(btnLogout);
 
         add(panelSidebar, BorderLayout.WEST);
 
@@ -97,99 +91,6 @@ public class CalendarUI extends JFrame {
         JPanel panelCalendarControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
         panelCalendarControls.setBackground(COLOR_BG);
 
-        comboCalendars = new JComboBox<>();
-        comboCalendars.setPreferredSize(new Dimension(200, 42));
-        comboCalendars.setFont(new Font("Segoe UI", Font.BOLD, 15));
-        comboCalendars.setBackground(Color.WHITE);
-        comboCalendars.setForeground(COLOR_TEXT_DARK);
-        comboCalendars.setFocusable(false);
-
-        comboCalendars.addActionListener(e -> {
-            if (comboCalendars.getSelectedItem() != null) {
-                this.currentCalendar = (DTO.Calendar) comboCalendars.getSelectedItem();
-                int cid = currentCalendar.getCalendarId();
-
-                if (appointmentListPanel != null) {
-                    appointmentListPanel.loadData(cid);
-                }
-                if (centralPanel != null) {
-                    centralPanel.refreshReminders(cid);
-                }
-
-                renderCalendar();
-            }
-        });
-
-        RoundedButton btnAddCal = new RoundedButton("+", 10, COLOR_PRIMARY, 1);
-        btnAddCal.setPreferredSize(new Dimension(45, 42));
-        btnAddCal.setBackground(COLOR_PRIMARY);
-        btnAddCal.setForeground(Color.WHITE);
-        btnAddCal.setFont(new Font("Segoe UI", Font.BOLD, 22));
-        btnAddCal.setFocusPainted(false);
-        btnAddCal.setMargin(new Insets(0, 0, 0, 0));
-
-        RoundedButton btnEditCal = new RoundedButton("Sửa", 10, new Color(255, 193, 7), 1);
-        btnEditCal.setPreferredSize(new Dimension(55, 42));
-        btnEditCal.setBackground(new Color(255, 193, 7));
-        btnEditCal.setForeground(Color.BLACK);
-        btnEditCal.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnEditCal.setFocusPainted(false);
-        btnEditCal.setMargin(new Insets(0, 0, 0, 0));
-
-        RoundedButton btnDelCal = new RoundedButton("Xóa", 10, new Color(220, 53, 69), 1);
-        btnDelCal.setPreferredSize(new Dimension(55, 42));
-        btnDelCal.setBackground(new Color(220, 53, 69));
-        btnDelCal.setForeground(Color.WHITE);
-        btnDelCal.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        btnDelCal.setFocusPainted(false);
-        btnDelCal.setMargin(new Insets(0, 0, 0, 0));
-
-        panelCalendarControls.add(comboCalendars);
-        panelCalendarControls.add(btnAddCal);
-        panelCalendarControls.add(btnEditCal);
-        panelCalendarControls.add(btnDelCal);
-
-        btnAddCal.addActionListener(e -> {
-            String name = JOptionPane.showInputDialog(this, "Nhập tên lịch mới:");
-            if (name != null && !name.trim().isEmpty()) {
-                String res = BLL.CalendarManager.addCalendar(currentUser.getUserId(), name);
-                if (res.equals("SUCCESS")) {
-                    refreshCalendarList();
-                } else {
-                    JOptionPane.showMessageDialog(this, res);
-                }
-            }
-        });
-
-        btnEditCal.addActionListener(e -> {
-            DTO.Calendar selected = (DTO.Calendar) comboCalendars.getSelectedItem();
-            if (selected != null) {
-                String newName = JOptionPane.showInputDialog(this, "Nhập tên mới cho lịch:", selected.getName());
-                if (newName != null && !newName.trim().isEmpty()) {
-                    String res = BLL.CalendarManager.updateCalendarName(selected.getCalendarId(), newName);
-                    if (res.equals("SUCCESS")) {
-                        refreshCalendarList();
-                    } else {
-                        JOptionPane.showMessageDialog(this, res);
-                    }
-                }
-            }
-        });
-
-        btnDelCal.addActionListener(e -> {
-            DTO.Calendar selected = (DTO.Calendar) comboCalendars.getSelectedItem();
-            if (selected != null) {
-                int confirm = JOptionPane.showConfirmDialog(this, "Xóa lịch '" + selected.getName() + "' sẽ xóa toàn bộ cuộc hẹn bên trong. Tiếp tục?", "Cảnh báo", JOptionPane.YES_NO_OPTION);
-                if (confirm == JOptionPane.YES_OPTION) {
-                    String res = BLL.CalendarManager.deleteCalendar(currentUser.getUserId(), selected.getCalendarId());
-                    if (res.equals("SUCCESS")) {
-                        refreshCalendarList();
-                    } else {
-                        JOptionPane.showMessageDialog(this, res);
-                    }
-                }
-            }
-        });
 
         btnPrev = createNavButton("<");
         btnNext = createNavButton(">");
@@ -234,11 +135,13 @@ public class CalendarUI extends JFrame {
         JPanel panelFooter = new JPanel(new FlowLayout(FlowLayout.CENTER, 25, 20));
         panelFooter.setBackground(COLOR_BG);
 
+
+        //bottom buttons
         btnToday = new RoundedButton("Hôm nay", 20, COLOR_PRIMARY, 1);
         btnToday.setFont(new Font("Segoe UI", Font.BOLD, 15));
         btnToday.setBackground(Color.WHITE);
         btnToday.setForeground(COLOR_PRIMARY);
-        btnToday.setPreferredSize(new Dimension(100, 45));
+        btnToday.setPreferredSize(new Dimension(150, 45));
 
         btnAddAppointment = new RoundedButton("+ Thêm Cuộc Hẹn", 20, COLOR_PRIMARY, 1);
         btnAddAppointment.setFont(new Font("Segoe UI", Font.BOLD, 15));
@@ -254,8 +157,8 @@ public class CalendarUI extends JFrame {
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
 
-        appointmentListPanel = new AppointmentListPanel(currentUser, 0);
-        centralPanel = new ReminderListPanel(currentUser.getUserId(), 0);
+        appointmentListPanel = new AppointmentListPanel();
+        centralPanel = new ReminderListPanel();
 
         cardPanel.add(panelMainContent, "CALENDAR_VIEW");
         cardPanel.add(appointmentListPanel, "LIST_VIEW");
@@ -271,22 +174,14 @@ public class CalendarUI extends JFrame {
         });
 
         btnListAppointments.addActionListener(e -> {
-            if (currentCalendar != null) {
-                appointmentListPanel.loadData(currentCalendar.getCalendarId());
-            }
             cardLayout.show(cardPanel, "LIST_VIEW");
             updateSidebarActive(btnListAppointments);
         });
 
         btnListReminders.addActionListener(e -> {
-            if (currentCalendar != null) {
-                centralPanel.refreshReminders(currentCalendar.getCalendarId());
-            }
             cardLayout.show(cardPanel, "REMINDER_VIEW");
             updateSidebarActive(btnListReminders);
         });
-
-        btnLogout.addActionListener(e -> logout() );
 
         btnPrev.addActionListener(e -> { currentYearMonth = currentYearMonth.minusMonths(1); renderCalendar(); });
         btnNext.addActionListener(e -> { currentYearMonth = currentYearMonth.plusMonths(1); renderCalendar(); });
@@ -363,21 +258,7 @@ public class CalendarUI extends JFrame {
         return btn;
     }
 
-    private void refreshCalendarList() {
-        List<DTO.Calendar> list = DAL.CalendarDAL.getCalendarsByUserId(currentUser.getUserId());
 
-        if (list.isEmpty()) {
-            BLL.CalendarManager.addCalendar(currentUser.getUserId(), "Lịch mặc định");
-            list = DAL.CalendarDAL.getCalendarsByUserId(currentUser.getUserId());
-        }
-
-        comboCalendars.setModel(new DefaultComboBoxModel<>(list.toArray(new DTO.Calendar[0])));
-        if (comboCalendars.getItemCount() > 0) {
-            comboCalendars.setSelectedIndex(0);
-            this.currentCalendar = (DTO.Calendar) comboCalendars.getSelectedItem();
-        }
-        renderCalendar();
-    }
 
     private void renderCalendar() {
         panelDays.removeAll();
@@ -441,18 +322,6 @@ public class CalendarUI extends JFrame {
         panelDays.repaint();
     }
 
-    private void logout() {
-        int confirm = JOptionPane.showConfirmDialog(this,
-                "Bạn có chắc chắn muốn đăng xuất không?",
-                "Xác nhận", JOptionPane.YES_NO_OPTION);
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            this.dispose();
-            currentUser = null;
-            currentCalendar = null;
-            new Login().setVisible(true);
-        }
-    }
 
     private void handleAddAppointment() {
         if (selectedDate.isBefore(LocalDate.now())) {
@@ -460,8 +329,14 @@ public class CalendarUI extends JFrame {
             return;
         }
 
-        AppointmentDialog addForm = new AppointmentDialog(this, true, currentUser, selectedDate, currentCalendar.getCalendarId(), null);
+        AppointmentDialog addForm = new AppointmentDialog(this, true, selectedDate, null);
         addForm.setVisible(true);
         renderCalendar();
+    }
+
+    public static void main(String[] args) {
+        try { UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); }
+        catch (Exception ex) {}
+        SwingUtilities.invokeLater(() -> new CalendarUI().setVisible(true));
     }
 }

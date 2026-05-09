@@ -1,46 +1,41 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package DTO;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author Admin
- */
 public class Reminder {
+    //attributes
+    public enum ReminderType{
+        H24, H12, H1, M30, M10, NOW
+    }
+
     private int reminderId;
     private int appointmentId;
-    private int userId;
-    private String reminderType;
+    private ReminderType reminderType;
     private LocalDateTime targetTime;
     private String message; 
-   
+
+    //methods
+    //constructors
     public Reminder() {}
     
-    public Reminder(int appointmentId, int userId, String reminderType, LocalDateTime targetTime, String message) {
+    public Reminder(int reminderId, int appointmentId, ReminderType reminderType, LocalDateTime targetTime, String message) {
+        this.reminderId = reminderId;
         this.appointmentId = appointmentId;
-        this.userId = userId;
         this.reminderType = reminderType;
         this.targetTime = targetTime;
         this.message = message;
     }
-    
-    public Reminder(int reminderId, int appointmentId, int userId, String reminderType, LocalDateTime targetTime, String message) {
-        this.reminderId = reminderId;
+    public Reminder( int appointmentId, ReminderType reminderType, LocalDateTime targetTime, String message) {
         this.appointmentId = appointmentId;
-        this.userId = userId;
         this.reminderType = reminderType;
         this.targetTime = targetTime;
         this.message = message;
     }
 
+    //get-set
     public int getReminderId() {
         return reminderId;
     }
-
     public void setReminderId(int reminderId) {
         this.reminderId = reminderId;
     }
@@ -48,42 +43,27 @@ public class Reminder {
     public int getAppointmentId() {
         return appointmentId;
     }
+    public void setAppointmentId(int appointmentId) {this.appointmentId = appointmentId;}
 
-    public void setAppointmentId(int appointmentId) {
-        this.appointmentId = appointmentId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public String getReminderType() {
+    public ReminderType getReminderType() {
         return reminderType;
     }
-
-    public void setReminderType(String reminderType) {
+    public void setReminderType(ReminderType reminderType) {
         this.reminderType = reminderType;
     }
 
     public LocalDateTime getTargetTime() {
         return targetTime;
     }
-
     public void setTargetTime(LocalDateTime targetTime) {
         this.targetTime = targetTime;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
+    public String getMessage() {return message;}
     public void setMessage(String message) {
         this.message = message;
     }
+
     
     
 }
